@@ -1,0 +1,4 @@
+.screenshots/
+.claude/
+node_modules/
+*.log

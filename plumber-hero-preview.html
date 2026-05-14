@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dropwork — Loodgieter Brugge</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue:    #1847ED;
+  --navy:    #0D1E5C;
+  --ink:     #1A2233;
+  --muted:   #64748b;
+  --light:   #94a3b8;
+  --bg:      #F7F8FC;
+  --surface: #ffffff;
+  --border:  #E8ECF4;
+  --radius:  12px;
+  --ease:    cubic-bezier(0.16,1,0.3,1);
+}
+* { font-family:'Inter',sans-serif; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; background:var(--bg); color:var(--ink); }
+
+/* ── Progress bar ─────────────────────────────────────────── */
+#progress-bar {
+  position:fixed; top:0; left:0; height:3px; width:0%;
+  background:var(--blue); z-index:9999; will-change:width;
+  transition:width .05s linear;
+}
+
+/* ── Floating Nav ─────────────────────────────────────────── */
+#nav {
+  position:fixed; top:1rem; left:50%; transform:translateX(-50%) translateY(-20px);
+  z-index:900; width:calc(100% - 2rem); max-width:72rem;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.75rem 1.25rem;
+  border-radius:1rem; border:1px solid rgba(255,255,255,.6);
+  background:rgba(255,255,255,.72); backdrop-filter:blur(14px);
+  box-shadow:0 4px 20px rgba(0,0,0,.06);
+  opacity:0;
+  transition:background .35s var(--ease), border-color .35s, box-shadow .35s, color .35s;
+  animation:navIn .5s .08s var(--ease) forwards;
+}
+#nav.scrolled {
+  background:var(--blue);
+  border-color:rgba(255,255,255,.15);
+  box-shadow:0 8px 32px rgba(24,71,237,.35);
+}
+#nav.scrolled .nav-logo { color:#fff; }
+#nav.scrolled .nav-logo-icon { background:rgba(255,255,255,.2); }
+#nav.scrolled .nav-links a { color:rgba(255,255,255,.8); }
+#nav.scrolled .nav-links a:hover { color:#fff; }
+#nav.scrolled .nav-cta { background:#fff; color:var(--blue); }
+#nav.scrolled .nav-cta:hover { background:rgba(255,255,255,.9); transform:translateY(-1px); }
+@keyframes navIn { to{opacity:1;transform:translateX(-50%) translateY(0)} }
+.nav-logo { display:flex;align-items:center;gap:.5rem;font-weight:800;color:var(--navy);font-size:1.125rem;text-decoration:none;transition:color .35s; }
+.nav-logo-icon { width:2rem;height:2rem;background:var(--blue);border-radius:.625rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .35s; }
+.nav-links { display:flex;gap:1.5rem;list-style:none;margin:0;padding:0; }
+.nav-links a { color:var(--muted);text-decoration:none;font-size:.875rem;font-weight:500;transition:color .2s; }
+.nav-links a:hover { color:var(--blue); }
+.nav-cta { display:flex;align-items:center;gap:.5rem;background:var(--navy);color:#fff;padding:.5rem 1.125rem;border-radius:.75rem;font-size:.875rem;font-weight:600;text-decoration:none;transition:background .2s,transform .2s,color .2s; }
+.nav-cta:hover { background:var(--blue);transform:translateY(-1px); }
+.nav-cta svg { width:1rem;height:1rem; }
+.nav-phone { display:none; }
+@media(min-width:640px){ .nav-phone{display:block} }
+@media(max-width:768px){ .nav-links{display:none} }
+
+/* ── Sticky mobile bar (scroll-triggered) ─────────────────── */
+.sticky-mobile {
+  display:none; position:fixed; bottom:0; left:0; right:0; z-index:800;
+  background:var(--blue); padding:.875rem 1.5rem;
+  box-shadow:0 -4px 20px rgba(0,0,0,.15);
+  transform:translateY(100%);
+  transition:transform .35s var(--ease);
+}
+.sticky-mobile.show { transform:translateY(0); }
+.sticky-mobile a { display:flex;align-items:center;justify-content:center;gap:.75rem;color:#fff;text-decoration:none;font-weight:700;font-size:1rem; }
+.sticky-mobile svg { width:1.25rem;height:1.25rem; }
+@media(max-width:640px){ .sticky-mobile{display:block} }
+
+/* ── Section helpers ──────────────────────────────────────── */
+.section { padding:5rem 1.5rem; }
+.section-alt { background:var(--surface); }
+.wrap { max-width:72rem;margin:0 auto; }
+.eyebrow { display:inline-block;font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:.75rem; }
+.section-header { text-align:center;max-width:48rem;margin:0 auto 3.5rem; }
+.section-header h2 { font-size:clamp(1.875rem,4vw,2.75rem)!important;font-weight:900!important;letter-spacing:-.03em!important;color:var(--navy)!important;line-height:1.1!important;margin:0 0 1rem!important; }
+.section-header p { font-size:1.125rem;color:var(--muted);line-height:1.7;margin:0; }
+
+/* Scroll reveal */
+[data-reveal] { opacity:0;transform:translateY(28px);transition:opacity .6s var(--ease),transform .6s var(--ease); }
+[data-reveal].visible { opacity:1;transform:none; }
+[data-reveal][data-delay="1"] { transition-delay:.1s }
+[data-reveal][data-delay="2"] { transition-delay:.2s }
+[data-reveal][data-delay="3"] { transition-delay:.3s }
+[data-reveal][data-delay="4"] { transition-delay:.4s }
+
+/* ── Hero ─────────────────────────────────────────────────── */
+.hero {
+  min-height:100vh; background:var(--bg);
+  display:flex;flex-direction:column;justify-content:center;
+  padding:7.5rem 1.5rem 4rem; position:relative;overflow:hidden;
+}
+.orb { position:absolute;border-radius:50%;filter:blur(56px);pointer-events:none; }
+.orb-1 { top:-10rem;right:-10rem;width:32rem;height:32rem;background:rgba(24,71,237,.07); }
+.orb-2 { bottom:-8rem;left:-8rem;width:26rem;height:26rem;background:rgba(56,189,248,.08); }
+.grid-bg { position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(var(--blue) 1px,transparent 1px),linear-gradient(90deg,var(--blue) 1px,transparent 1px);background-size:48px 48px;opacity:.025; }
+
+.hero-inner { position:relative;z-index:10;width:100%;max-width:72rem;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:3rem; }
+
+.trust-badge { display:inline-flex;align-items:center;gap:.5rem;background:#fff;border:1px solid var(--border);border-radius:9999px;padding:.375rem 1rem;margin-bottom:2rem;box-shadow:0 1px 4px rgba(0,0,0,.05);font-size:.875rem;font-weight:500;color:#334155;animation:fadeUp .6s .1s var(--ease) both; }
+.live-wrap { position:relative;width:.5rem;height:.5rem;flex-shrink:0; }
+.live-core,.live-ring { position:absolute;inset:0;border-radius:50%;background:#10b981; }
+.live-ring { opacity:.75;animation:ping 1.5s ease-in-out infinite; }
+@keyframes ping { 0%,100%{transform:scale(1);opacity:.75}50%{transform:scale(2.2);opacity:0} }
+
+h1.hero-h1 { font-size:clamp(3rem,7.5vw,5rem)!important;font-weight:900!important;line-height:1.06!important;letter-spacing:-.035em!important;color:var(--navy)!important;margin:0 0 1rem!important;animation:fadeUp .6s .2s var(--ease) both; }
+.rotating-wrap { position:relative;display:inline-block;min-width:18rem; }
+.rotating-word { display:block;color:var(--blue);animation:wordIn .42s var(--ease) both; }
+@keyframes wordIn { from{opacity:0;transform:translateY(14px);filter:blur(4px)}to{opacity:1;transform:none;filter:blur(0)} }
+@keyframes wordOut { from{opacity:1;transform:none;filter:blur(0)}to{opacity:0;transform:translateY(-14px);filter:blur(4px)} }
+
+.hero-sub { font-size:1.125rem;line-height:1.75;color:var(--muted);max-width:36rem;margin:0 0 2.5rem;animation:fadeUp .6s .35s var(--ease) both; }
+.cta-row { display:flex;flex-wrap:wrap;gap:.75rem;margin-bottom:3rem;animation:fadeUp .6s .45s var(--ease) both; }
+.btn-primary { display:inline-flex;align-items:center;gap:.75rem;background:var(--blue);color:#fff;font-weight:700;font-size:1.125rem;padding:1rem 2rem;border-radius:.875rem;text-decoration:none;box-shadow:0 12px 32px rgba(24,71,237,.28);transition:background .2s,transform .2s,box-shadow .2s;border:none;cursor:pointer; }
+.btn-primary:hover { background:#1238C7;transform:translateY(-2px);box-shadow:0 16px 40px rgba(24,71,237,.38); }
+.btn-primary svg { width:1.25rem;height:1.25rem;transition:transform .2s; }
+.btn-primary:hover svg { transform:rotate(12deg); }
+.btn-phone { font-size:.875rem;font-weight:400;opacity:.8; }
+.btn-secondary { display:inline-flex;align-items:center;gap:.5rem;border:2px solid var(--border);color:#334155;font-weight:600;font-size:1rem;padding:1rem 1.75rem;border-radius:.875rem;text-decoration:none;background:#fff;transition:border-color .2s,color .2s,transform .2s; }
+.btn-secondary:hover { border-color:var(--blue);color:var(--blue);transform:translateY(-2px); }
+.btn-secondary svg { width:1.25rem;height:1.25rem;transition:transform .2s; }
+.btn-secondary:hover svg { transform:translateX(4px); }
+
+.trust-row { display:flex;flex-wrap:wrap;gap:1.5rem 2rem;animation:fadeUp .6s .55s var(--ease) both; }
+.trust-pill { display:flex;align-items:center;gap:.5rem;font-size:.875rem;font-weight:500;color:var(--muted); }
+.trust-pill svg { color:var(--blue);width:1rem;height:1rem;flex-shrink:0; }
+
+/* Info card */
+.info-card { flex-shrink:0;width:17rem;background:#fff;border-radius:1.25rem;border:1px solid var(--border);box-shadow:0 20px 56px rgba(0,0,0,.09);padding:1.375rem;animation:infoIn .7s 1s var(--ease) both; }
+@keyframes infoIn { from{opacity:0;transform:translateX(2rem) scale(.96)}to{opacity:1;transform:none scale(1)} }
+.info-label { font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--light);margin-bottom:.875rem; }
+.info-row { display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem; }
+.info-row:last-child { margin-bottom:0; }
+.info-icon { flex-shrink:0;width:2.25rem;height:2.25rem;border-radius:.75rem;background:#EFF4FF;display:flex;align-items:center;justify-content:center; }
+.info-icon svg { width:1rem;height:1rem;color:var(--blue); }
+.info-text { font-size:.8125rem;font-weight:500;color:#334155;line-height:1.45; }
+
+/* Stats strip — hidden from hero fold on all viewports; proof lives in trust section */
+.stats { display:none; }
+@media(max-width:640px){
+  /* Full-screen hero on mobile — keeps marquee + trust cards below fold */
+  .hero { min-height:100svh; min-height:100dvh; padding-top:5.5rem; padding-bottom:2rem; justify-content:flex-start; }
+  .trust-badge { margin-bottom:1.25rem; }
+  .hero-sub { margin-bottom:1.75rem; }
+  .cta-row { margin-bottom:2rem; }
+  .trust-row { flex-wrap:wrap; gap:.75rem 1.5rem; }
+  .rotating-wrap { min-width:auto; max-width:100%; overflow:hidden; }
+  h1.hero-h1 { font-size:clamp(1.875rem,9vw,3.5rem)!important; }
+}
+@media(max-width:480px){ .cta-row{flex-direction:column} .btn-primary,.btn-secondary{justify-content:center} .info-card{display:none} }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none} }
+
+/* ── Marquee ──────────────────────────────────────────────── */
+.marquee-section { background:var(--navy);padding:1rem 0;overflow:hidden; }
+.marquee-track { display:flex;gap:0;white-space:nowrap;animation:marquee 28s linear infinite; }
+.marquee-item { display:inline-flex;align-items:center;gap:.75rem;color:rgba(255,255,255,.75);font-size:.875rem;font-weight:500;padding:0 2.5rem; }
+.marquee-dot { width:.375rem;height:.375rem;border-radius:50%;background:var(--blue);flex-shrink:0; }
+@keyframes marquee { from{transform:translateX(0)}to{transform:translateX(-50%)} }
+
+/* ── Trust strip ──────────────────────────────────────────── */
+.trust-section { padding:4.5rem 1.5rem; }
+.trust-grid { display:grid;grid-template-columns:repeat(4,1fr);gap:2rem; }
+.trust-card { text-align:center;padding:2rem 1.5rem;background:#fff;border-radius:1.25rem;border:1px solid var(--border);box-shadow:0 2px 12px rgba(0,0,0,.04);transition:transform .25s var(--ease),box-shadow .25s var(--ease); }
+.trust-card:hover { transform:translateY(-3px);box-shadow:0 8px 28px rgba(24,71,237,.1); }
+.trust-card svg { display:block;margin:0 auto 1rem;color:var(--blue);width:1.75rem;height:1.75rem; }
+.trust-number { font-size:2.5rem;font-weight:900;color:var(--navy);letter-spacing:-.03em;line-height:1; }
+.trust-label { font-size:.875rem;color:var(--muted);margin-top:.375rem; }
+@media(max-width:768px){ .trust-grid{grid-template-columns:repeat(2,1fr)} }
+@media(max-width:480px){ .trust-grid{grid-template-columns:repeat(2,1fr);gap:1rem} .trust-card{padding:1.5rem 1rem} }
+
+/* ── Services ─────────────────────────────────────────────── */
+.services-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem;margin-bottom:2.5rem; }
+.service-card { position:relative;overflow:hidden;background:#fff;border:1px solid var(--border);border-radius:1.25rem;padding:2rem;text-align:center;transition:box-shadow .3s var(--ease),background .2s;transform-style:preserve-3d;will-change:transform; }
+.service-card:hover { box-shadow:0 16px 48px rgba(24,71,237,.12);background:#FAFBFF; }
+/* Card 1 – dark navy */
+.service-card.featured { background:var(--navy);border-color:var(--navy); }
+.service-card.featured h3,.service-card.featured p { color:#fff; }
+.service-card.featured .service-tag { background:rgba(255,255,255,.12);color:rgba(255,255,255,.85); }
+.service-card.featured .service-link { color:rgba(255,255,255,.9); }
+.service-card.featured .service-link:hover { color:#fff; }
+/* Card 2 – blue */
+.services-grid .service-card:nth-child(2) { background:var(--blue);border-color:var(--blue); }
+.services-grid .service-card:nth-child(2) h3,.services-grid .service-card:nth-child(2) p { color:#fff; }
+.services-grid .service-card:nth-child(2) .service-tag { background:rgba(255,255,255,.15);color:rgba(255,255,255,.9); }
+.services-grid .service-card:nth-child(2) .service-link { color:rgba(255,255,255,.9); }
+.services-grid .service-card:nth-child(2):hover { background:#1238C7; }
+/* Card 3 – light blue */
+.services-grid .service-card:nth-child(3) { background:#EFF4FF;border-color:#DBEAFE; }
+.services-grid .service-card:nth-child(3):hover { background:#E0EBFF; }
+/* Card 4 – white (default) */
+.service-tag { display:inline-flex;align-items:center;justify-content:center;gap:.375rem;font-size:.75rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--blue);background:#EFF4FF;border-radius:.5rem;padding:.25rem .625rem;margin-bottom:1.25rem; }
+.service-tag svg { width:.875rem;height:.875rem; }
+.service-card h3 { font-size:1.25rem;font-weight:800;color:var(--navy);margin:0 0 .75rem;letter-spacing:-.02em; }
+.service-card p { font-size:.9375rem;color:var(--muted);line-height:1.65;margin:0 0 1.5rem; }
+.service-link { display:inline-flex;align-items:center;justify-content:center;gap:.5rem;font-size:.875rem;font-weight:600;color:var(--blue);text-decoration:none;transition:gap .2s; }
+.service-link:hover { gap:.75rem; }
+.service-link svg { width:.875rem;height:.875rem; }
+.services-cta { text-align:center;padding:1.5rem 0 0; }
+.services-cta .label { display:block;font-size:.875rem;color:var(--muted);margin-top:.75rem; }
+@media(max-width:768px){ .services-grid{grid-template-columns:1fr} }
+
+/* ── Icon micro-animations ────────────────────────────────── */
+@keyframes iconFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+@keyframes iconPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.7;transform:scale(1.15)} }
+@keyframes iconSpin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+@keyframes iconFlicker { 0%,100%{opacity:1} 45%{opacity:.75} 50%{opacity:1} 55%{opacity:.6} 60%{opacity:1} }
+.service-card:nth-child(1) .service-tag svg { animation:iconFlicker 2.8s ease-in-out infinite; }
+.service-card:nth-child(2) .service-tag svg { animation:iconFloat 3s ease-in-out infinite; }
+.service-card:nth-child(3) .service-tag svg { animation:iconPulse 2.4s ease-in-out infinite; }
+.service-card:nth-child(4) .service-tag svg { animation:iconFloat 3.5s ease-in-out infinite .4s; }
+.why-badge svg { animation:iconFloat 3s ease-in-out infinite; }
+
+/* ── Before/After Slider ──────────────────────────────────── */
+.proof-section { padding:5rem 1.5rem;background:var(--surface); }
+.proof-header-row { display:flex;align-items:flex-end;justify-content:space-between;gap:2rem;margin-bottom:2.5rem;flex-wrap:wrap; }
+.proof-header-row .section-header { text-align:left;margin:0; }
+.proof-tabs { display:flex;gap:.5rem;flex-shrink:0; }
+.proof-tab { padding:.5rem 1.25rem;border-radius:.625rem;font-size:.8125rem;font-weight:600;background:transparent;border:1.5px solid var(--border);color:var(--muted);cursor:pointer;transition:all .2s; }
+.proof-tab.active,.proof-tab:hover { background:var(--blue);border-color:var(--blue);color:#fff; }
+
+.slider-shell { position:relative;border-radius:1.25rem;overflow:hidden;user-select:none;aspect-ratio:16/9;cursor:col-resize;background:#e2e8f0; }
+.slide { position:absolute;inset:0;display:none; }
+.slide.active { display:block; }
+.slide-before,.slide-after { position:absolute;inset:0;background-size:cover;background-position:center; }
+.slide-after { clip-path:inset(0 50% 0 0); }
+.slide-label { position:absolute;bottom:1rem;padding:.375rem .875rem;border-radius:.5rem;font-size:.75rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;background:rgba(0,0,0,.5);color:#fff;backdrop-filter:blur(4px); }
+.slide-label-before { left:1rem; }
+.slide-label-after { right:1rem; }
+.slider-divider { position:absolute;top:0;bottom:0;width:2px;background:#fff;left:50%;transform:translateX(-50%);z-index:10;pointer-events:none;box-shadow:0 0 12px rgba(0,0,0,.3); }
+.slider-handle { position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:2.75rem;height:2.75rem;background:var(--blue);border-radius:50%;border:3px solid #fff;display:flex;align-items:center;justify-content:center;gap:2px;cursor:col-resize;pointer-events:all;box-shadow:0 4px 16px rgba(24,71,237,.4); }
+.slider-handle svg { width:1rem;height:1rem;color:#fff;flex-shrink:0; }
+
+.slider-caption { display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;background:#fff;border:1px solid var(--border);border-top:none;border-radius:0 0 1.25rem 1.25rem;flex-wrap:wrap;gap:1rem; }
+.caption-title { font-size:1.0625rem;font-weight:700;color:var(--navy);margin-bottom:.25rem; }
+.caption-meta { font-size:.8125rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em; }
+.caption-badge-el { display:inline-flex;align-items:center;gap:.5rem;background:#EFF4FF;color:var(--blue);font-size:.75rem;font-weight:700;padding:.375rem .875rem;border-radius:.5rem;flex-shrink:0; }
+.caption-badge-el svg { width:.875rem;height:.875rem; }
+.caption-time-highlight { display:inline-block;background:rgba(24,71,237,.12);color:var(--blue);font-weight:700;padding:1px 7px;border-radius:4px;animation:captionPulse 2.2s ease-in-out infinite; }
+@keyframes captionPulse { 0%,100%{background:rgba(24,71,237,.12);box-shadow:0 0 0 0 rgba(24,71,237,.2)}50%{background:rgba(24,71,237,.19);box-shadow:0 0 0 4px rgba(24,71,237,.07)} }
+
+/* ── Reviews ──────────────────────────────────────────────── */
+.reviews-section { padding:4rem 0;background:var(--bg);overflow:hidden; }
+.reviews-section .wrap { padding:0 1.5rem; }
+.aggregate { display:flex;align-items:center;gap:3rem;flex-wrap:wrap;margin-bottom:2.5rem;padding:2rem;background:#fff;border-radius:1.25rem;border:1px solid var(--border);box-shadow:0 2px 12px rgba(0,0,0,.04); }
+.agg-score-big { font-size:4rem;font-weight:900;color:var(--navy);letter-spacing:-.04em;line-height:1; }
+.agg-stars { color:#FBBF24;font-size:1.25rem;letter-spacing:.1em;margin:.25rem 0; }
+.agg-count { font-size:.875rem;color:var(--muted); }
+@media(max-width:640px){
+  .reviews-section { padding:2.5rem 0; }
+  .aggregate { padding:1.25rem;gap:1.5rem; }
+  .agg-score-big { font-size:2.75rem; }
+  .reviews-section .section-header { margin-bottom:2rem; }
+  .reviews-section .section-header h2 { font-size:1.625rem!important; }
+}
+.platform-rows { flex:1;min-width:200px;display:flex;flex-direction:column;gap:.875rem; }
+.platform-row { display:flex;align-items:center;gap:.875rem; }
+.platform-name { width:5rem;font-size:.8125rem;font-weight:600;color:var(--ink);flex-shrink:0; }
+.platform-bar-bg { flex:1;height:.5rem;background:var(--border);border-radius:9999px;overflow:hidden; }
+.platform-bar { height:100%;background:var(--blue);border-radius:9999px;transition:width 1.2s var(--ease);width:0; }
+.platform-score { width:2rem;text-align:right;font-size:.8125rem;font-weight:700;color:var(--navy); }
+
+.reviews-marquee { margin-top:2.5rem;overflow:hidden; }
+.reviews-track { display:flex;gap:1.5rem;animation:reviewScroll 40s linear infinite;width:max-content; }
+.reviews-track:hover { animation-play-state:paused; }
+.review-card { flex-shrink:0;width:20rem;background:#fff;border-radius:1.25rem;border:1px solid var(--border);padding:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,.04); }
+.review-stars { color:#FBBF24;font-size:1rem;letter-spacing:.05em;margin-bottom:.875rem; }
+.review-text { font-size:.9375rem;color:var(--ink);line-height:1.65;margin-bottom:1rem; }
+.review-author { display:flex;flex-direction:column;gap:.125rem; }
+.review-author strong { font-size:.875rem;font-weight:700;color:var(--navy); }
+.review-author span { font-size:.8125rem;color:var(--muted); }
+@keyframes reviewScroll { from{transform:translateX(0)}to{transform:translateX(-50%)} }
+
+/* ── Why Us ───────────────────────────────────────────────── */
+.why-section { padding:5rem 1.5rem; }
+.why-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:2rem;position:relative; }
+/* Desktop connecting line */
+.why-grid::after { content:'';position:absolute;left:50%;top:2rem;width:2px;height:0;background:linear-gradient(to bottom,var(--blue),rgba(24,71,237,.15));border-radius:2px;transform:translateX(-50%);transition:height 1.4s cubic-bezier(.16,1,.3,1); pointer-events:none; }
+.why-grid.line-active::after { height:calc(100% - 4rem); }
+.why-card { background:#fff;border-radius:1.25rem;border:1px solid var(--border);padding:2rem;transition:box-shadow .3s var(--ease); }
+.why-card:hover { box-shadow:0 10px 32px rgba(24,71,237,.09); }
+.why-number { display:inline-flex;align-items:center;justify-content:center;width:2rem;height:2rem;border-radius:50%;background:var(--blue);color:#fff;font-size:.8125rem;font-weight:900;letter-spacing:0;line-height:1;margin-bottom:1.25rem;flex-shrink:0; }
+.why-card h3 { font-size:1.1875rem;font-weight:800;color:var(--navy);margin:0 0 .75rem;letter-spacing:-.02em; }
+.why-card p { font-size:.9375rem;color:var(--muted);line-height:1.65;margin:0 0 1.25rem; }
+.why-badge { display:inline-flex;align-items:center;gap:.5rem;font-size:.75rem;font-weight:600;color:var(--blue);background:#EFF4FF;border-radius:.5rem;padding:.375rem .75rem; }
+.why-badge svg { width:.875rem;height:.875rem; }
+/* Mobile vertical connector */
+@media(max-width:768px){
+  .why-grid { grid-template-columns:1fr; padding-left:2.75rem; }
+  .why-grid::after { left:.875rem; top:1.5rem; height:0; width:2px; transform:none; }
+  .why-grid.line-active::after { height:calc(100% - 3rem); }
+  .why-card { position:relative; }
+  .why-number { position:absolute;left:-2.75rem;top:1.5rem;width:1.75rem;height:1.75rem;background:var(--blue);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:900;letter-spacing:0;margin-bottom:0; }
+}
+
+/* ── Final CTA ────────────────────────────────────────────── */
+.cta-section { background:var(--navy);padding:5rem 1.5rem;position:relative;overflow:hidden; }
+.cta-section::before { content:'';position:absolute;top:-12rem;right:-12rem;width:36rem;height:36rem;border-radius:50%;background:rgba(24,71,237,.25);filter:blur(72px);pointer-events:none; }
+.cta-section::after { content:'';position:absolute;bottom:-8rem;left:-8rem;width:24rem;height:24rem;border-radius:50%;background:rgba(56,189,248,.12);filter:blur(56px);pointer-events:none; }
+.cta-inner { position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:2.5rem; }
+.cta-inner > [data-reveal] { display:flex;flex-direction:column;align-items:center;width:100%; }
+.cta-inner h2 { font-size:clamp(2rem,4vw,3rem)!important;font-weight:900!important;color:#fff!important;letter-spacing:-.03em!important;line-height:1.1!important;margin:0 0 1rem!important; }
+.cta-sub { font-size:1.125rem;color:rgba(255,255,255,.7);line-height:1.65;max-width:38rem;margin:0 0 2rem; }
+.cta-phone-block { margin-bottom:1.5rem; }
+.cta-phone-label { display:block;font-size:.8125rem;font-weight:600;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.375rem; }
+.cta-phone-number { font-size:2rem;font-weight:900;color:#fff;text-decoration:none;letter-spacing:-.02em;transition:color .2s; }
+.cta-phone-number:hover { color:#93C5FD; }
+.cta-assurances { display:flex;flex-wrap:wrap;gap:1rem 2rem;margin-top:1.5rem;justify-content:center; }
+.assurance { display:flex;align-items:center;gap:.5rem;font-size:.875rem;font-weight:500;color:rgba(255,255,255,.7); }
+.assurance svg { color:#4ADE80;width:1rem;height:1rem;flex-shrink:0; }
+.btn-primary-white { display:inline-flex;align-items:center;gap:.75rem;background:#fff;color:var(--blue);font-weight:700;font-size:1.125rem;padding:1rem 2rem;border-radius:.875rem;text-decoration:none;box-shadow:0 12px 32px rgba(0,0,0,.25);transition:transform .2s,box-shadow .2s; }
+.btn-primary-white:hover { transform:translateY(-2px);box-shadow:0 16px 40px rgba(0,0,0,.3); }
+.btn-primary-white svg { width:1.25rem;height:1.25rem; }
+.cta-cards { display:flex;flex-direction:row;gap:1rem;flex-wrap:wrap;justify-content:center; }
+.cta-card { background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:1.25rem;padding:1.5rem 1.75rem;backdrop-filter:blur(8px);flex:1;min-width:11rem;max-width:16rem;text-align:center; }
+.cta-card-title { font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:.625rem; }
+.cta-card-value { font-size:1.875rem;font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1;margin-bottom:.375rem; }
+.cta-card-sub { font-size:.8125rem;color:rgba(255,255,255,.6);line-height:1.5; }
+/* CTA phone action buttons */
+.cta-actions { display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1.5rem;justify-content:center; }
+.btn-cta-call { display:inline-flex;align-items:center;gap:.625rem;background:#fff;color:var(--blue);font-weight:700;font-size:1rem;padding:.875rem 1.75rem;border-radius:.875rem;text-decoration:none;box-shadow:0 8px 24px rgba(0,0,0,.2);transition:transform .2s,box-shadow .2s; }
+.btn-cta-call:hover { transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,0,0,.28); }
+.btn-cta-call svg { width:1.125rem;height:1.125rem; }
+.btn-cta-copy { display:inline-flex;align-items:center;gap:.625rem;background:rgba(255,255,255,.1);color:#fff;font-weight:600;font-size:1rem;padding:.875rem 1.75rem;border-radius:.875rem;border:1px solid rgba(255,255,255,.2);cursor:pointer;transition:background .2s,transform .2s;font-family:inherit; }
+.btn-cta-copy:hover { background:rgba(255,255,255,.18);transform:translateY(-1px); }
+.btn-cta-copy svg { width:1.125rem;height:1.125rem; }
+.btn-cta-copy.copied { background:rgba(74,222,128,.2);border-color:rgba(74,222,128,.4);color:#4ade80; }
+@media(max-width:560px){ .cta-cards{display:none} }
+
+/* ── Footer ───────────────────────────────────────────────── */
+footer { background:#0A1540;padding:3.5rem 1.5rem 2rem; }
+.footer-inner { display:flex;gap:3rem;justify-content:space-between;flex-wrap:wrap;margin-bottom:2.5rem; }
+.footer-logo { display:flex;align-items:center;gap:.625rem;font-weight:800;color:#fff;font-size:1.125rem;margin-bottom:.625rem; }
+.footer-logo-icon { width:2rem;height:2rem;background:var(--blue);border-radius:.625rem;display:flex;align-items:center;justify-content:center; }
+.footer-logo-icon svg { width:1rem;height:1rem; }
+.footer-tagline { font-size:.875rem;color:rgba(255,255,255,.45); }
+.footer-cols { display:flex;gap:3rem;flex-wrap:wrap; }
+.footer-col { display:flex;flex-direction:column;gap:.5rem;min-width:9rem; }
+.footer-col-title { font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:.25rem; }
+.footer-col a,.footer-col p { font-size:.9375rem;color:rgba(255,255,255,.65);text-decoration:none;margin:0;transition:color .15s;line-height:1.6; }
+.footer-col a:hover { color:#fff; }
+.footer-col .phone { color:#fff;font-weight:700;font-size:1.0625rem; }
+.footer-col .emergency { color:var(--blue);font-weight:700; }
+.footer-bottom { border-top:1px solid rgba(255,255,255,.08);padding-top:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem; }
+.footer-legal { font-size:.8125rem;color:rgba(255,255,255,.35); }
+.footer-legal-row { display:flex;gap:2rem;flex-wrap:wrap; }
+</style>
+</head>
+<body>
+
+<!-- Progress bar -->
+<div id="progress-bar"></div>
+
+<!-- Floating nav -->
+<nav id="nav">
+  <a class="nav-logo" href="#">
+    <div class="nav-logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 2C12 2 4 10 4 15a8 8 0 0016 0c0-5-8-13-8-13z"/></svg>
+    </div>
+    Dropwork
+  </a>
+  <ul class="nav-links">
+    <li><a href="#diensten">Diensten</a></li>
+    <li><a href="#reviews">Reviews</a></li>
+    <li><a href="#waarom">Over ons</a></li>
+  </ul>
+  <a href="tel:+3250000000" class="nav-cta">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 1.04h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 15.92z"/></svg>
+    <span class="nav-phone">+32 500 00 00</span>
+    <span style="display:none" class="nav-mobile-text">Bel</span>
+  </a>
+</nav>
+
+<!-- Sticky mobile bar -->
+<div class="sticky-mobile">
+  <a href="tel:+3250000000">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 1.04h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 15.92z"/></svg>
+    Bel Nu — 24/7 Spoed
+  </a>
+</div>
+
+<!-- ═══════════════════════════════════════ HERO ═══════════ -->
+<section class="hero" id="hero">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="grid-bg"></div>
+
+  <div class="hero-inner">
+    <div style="flex:1;min-width:0">
+
+      <div class="trust-badge">
+        <div class="live-wrap"><div class="live-ring"></div><div class="live-core"></div></div>
+        Nu beschikbaar — 24/7 spoedservice
+      </div>
+
+      <h1 class="hero-h1">
+        Problemen met<br>
+        <span class="rotating-wrap">
+          <span class="rotating-word" id="rotating-word">lekken</span>
+        </span>
+      </h1>
+
+      <p class="hero-sub">
+        Snelle en betrouwbare loodgieter voor herstellingen, ontstoppingen en
+        installaties. Transparante prijzen, propere afwerking en snelle service
+        bij u in de buurt.
+      </p>
+
+      <div class="cta-row">
+        <a href="tel:+3250000000" class="btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 1.04h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 15.92z"/></svg>
+          Bel Nu
+          <span class="btn-phone">+32 500 00 00</span>
+        </a>
+        <a href="#contact" class="btn-secondary">
+          Vraag Service Aan
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+
+      <div class="trust-row">
+        <div class="trust-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 24/7 Spoedservice</div>
+        <div class="trust-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Snelle Interventie</div>
+        <div class="trust-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg> Erkende Loodgieters</div>
+        <div class="trust-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/></svg> Transparante Prijzen</div>
+      </div>
+    </div>
+
+    <!-- Info card -->
+    <div class="info-card">
+      <div class="info-label">Onze belofte</div>
+      <div class="info-row">
+        <div class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <span class="info-text">Gemiddelde responstijd: 30–60 min</span>
+      </div>
+      <div class="info-row">
+        <div class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <span class="info-text">Geen verborgen kosten</span>
+      </div>
+      <div class="info-row">
+        <div class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+        <span class="info-text">Zelfde dag geholpen</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats strip -->
+  <div class="stats">
+    <div><div class="stat-val">45 min</div><div class="stat-lbl">Gem. aankomsttijd</div></div>
+    <div><div class="stat-val">4.800+</div><div class="stat-lbl">Voltooide klussen</div></div>
+    <div><div class="stat-val">15 jr</div><div class="stat-lbl">Ervaring</div></div>
+    <div><div class="stat-val">100%</div><div class="stat-lbl">Tevredenheid</div></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════ MARQUEE ══════════ -->
+<div class="marquee-section" aria-hidden="true">
+  <div class="marquee-track">
+    <span class="marquee-item"><span class="marquee-dot"></span> Noodloodgieters</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Lekdetectie &amp; Reparatie</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Ketelonderhoud</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Afvoer Ontstopping</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Centrale Verwarming</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Pijpvervanging</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Badkamer Installatie</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> 24/7 Beschikbaar</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Vaste Prijsofferte</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Noodloodgieters</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Lekdetectie &amp; Reparatie</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Ketelonderhoud</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Afvoer Ontstopping</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Centrale Verwarming</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Pijpvervanging</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Badkamer Installatie</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> 24/7 Beschikbaar</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Vaste Prijsofferte</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ TRUST STRIP ══════ -->
+<section class="trust-section section-alt" id="vertrouwen">
+  <div class="wrap">
+    <div class="trust-grid">
+      <div class="trust-card" data-reveal data-delay="1">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <div class="trust-number" data-count="45" data-suffix=" min">45 min</div>
+        <div class="trust-label">Gemiddelde aankomsttijd</div>
+      </div>
+      <div class="trust-card" data-reveal data-delay="2">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        <div class="trust-number" data-count="4800" data-suffix="+">4.800+</div>
+        <div class="trust-label">Tevreden klanten</div>
+      </div>
+      <div class="trust-card" data-reveal data-delay="3">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <div class="trust-number" data-count="15" data-suffix=" jr">15 jr</div>
+        <div class="trust-label">Gecertificeerde ervaring</div>
+      </div>
+      <div class="trust-card" data-reveal data-delay="4">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        <div class="trust-number">Gratis</div>
+        <div class="trust-label">Als het niet lukt — onze garantie</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════ SERVICES ═════════ -->
+<section class="section" id="diensten">
+  <div class="wrap">
+    <div class="section-header" data-reveal>
+      <span class="eyebrow">Wat wij oplossen</span>
+      <h2>Elk loodgietersprobleem, dezelfde dag opgelost.</h2>
+      <p>Van gesprongen pijpen om 2u 's nachts tot geplande badkamerinstallaties. Eén nummer, elke klus.</p>
+    </div>
+    <div class="services-grid">
+      <div class="service-card featured" data-reveal data-delay="1">
+        <div class="service-tag" style="background:rgba(255,255,255,.12);color:rgba(255,255,255,.85)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Prioriteit respons
+        </div>
+        <h3>Noodloodgieters</h3>
+        <p>Gesprongen pijp, overstroomde vloer, geen warm water. Wij zijn ter plaatse binnen 45 minuten, dag en nacht. Geen meerprijs buiten kantooruren.</p>
+        <a href="tel:+3250000000" class="service-link">
+          Bel nu
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
+      <div class="service-card" data-reveal data-delay="2">
+        <div class="service-tag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/></svg>
+          Lek specialist
+        </div>
+        <h3>Lekdetectie &amp; Reparatie</h3>
+        <p>Verborgen lekken kosten honderden euro's aan verspild water en structurele schade. Wij lokaliseren de bron precies en herstellen het in één beurt.</p>
+        <a href="tel:+3250000000" class="service-link">
+          Offerte aanvragen
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
+      <div class="service-card" data-reveal data-delay="3">
+        <div class="service-tag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+          Afvoer specialist
+        </div>
+        <h3>Afvoer Ontstopping</h3>
+        <p>Trage afvoeren, terugstroom, slechte geuren — binnen het uur verholpen met professionele persapparatuur. Geen rommel, geen beschadiging.</p>
+        <a href="tel:+3250000000" class="service-link">
+          Vandaag boeken
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
+      <div class="service-card" data-reveal data-delay="4">
+        <div class="service-tag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+          Verwarming
+        </div>
+        <h3>Ketel Reparatie &amp; Onderhoud</h3>
+        <p>Geen verwarming, geen warm water — wij onderhouden alle merken en modellen. Jaarlijkse onderhoudsplannen met prioriteit beschikbaar.</p>
+        <a href="tel:+3250000000" class="service-link">
+          Ketel laten nakijken
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="services-cta" data-reveal>
+      <a href="tel:+3250000000" class="btn-primary" style="display:inline-flex">Bel voor elke klus</a>
+      <span class="label" style="display:block;font-size:.875rem;color:var(--muted);margin-top:.75rem">Geen voorrijkosten · Prijs vóór aanvang</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════ BEFORE/AFTER ══════ -->
+<section class="proof-section" id="resultaten">
+  <div class="wrap">
+    <div class="proof-header-row">
+      <div class="section-header" data-reveal>
+        <span class="eyebrow">Echte resultaten</span>
+        <h2>Het werk spreekt<br>voor zich.</h2>
+        <p>Elke klus achtergelaten netter dan we het aantroffen. Gegarandeerd.</p>
+      </div>
+      <div class="proof-tabs">
+        <button class="proof-tab active" data-slide="0">Badkamer</button>
+        <button class="proof-tab" data-slide="1">Afvoer</button>
+        <button class="proof-tab" data-slide="2">Kraan</button>
+      </div>
+    </div>
+
+    <div class="slider-shell" id="sliderShell">
+      <div class="slide active">
+        <div class="slide-before" style="background-image:url('images/before-bathroom.png');background-size:cover;background-position:center"></div>
+        <div class="slide-after"  style="background-image:url('images/after-bathroom.png');background-size:cover;background-position:center"></div>
+        <span class="slide-label slide-label-before">Voor</span>
+        <span class="slide-label slide-label-after">Na</span>
+      </div>
+      <div class="slide">
+        <div class="slide-before" style="background-image:url('images/before-drain.png');background-size:cover;background-position:center"></div>
+        <div class="slide-after"  style="background-image:url('images/after-drain.png');background-size:cover;background-position:center"></div>
+        <span class="slide-label slide-label-before">Voor</span>
+        <span class="slide-label slide-label-after">Na</span>
+      </div>
+      <div class="slide">
+        <div class="slide-before" style="background-image:url('images/before-faucet.png');background-size:cover;background-position:center"></div>
+        <div class="slide-after"  style="background-image:url('images/after-faucet.png');background-size:cover;background-position:center"></div>
+        <span class="slide-label slide-label-before">Voor</span>
+        <span class="slide-label slide-label-after">Na</span>
+      </div>
+      <div class="slider-divider" id="sliderDivider">
+        <div class="slider-handle" id="sliderHandle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="slider-caption">
+      <div>
+        <div class="caption-title" id="captionTitle">Badkamer Installatie</div>
+        <div class="caption-meta" id="captionMeta">Opgelost in <span class="caption-time-highlight">4u</span> · Brugge</div>
+      </div>
+      <div class="caption-badge-el">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Zelfde dag opgelost
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════ REVIEWS ══════════ -->
+<section class="reviews-section" id="reviews">
+  <div class="wrap">
+    <div class="section-header" data-reveal>
+      <span class="eyebrow">Wat klanten zeggen</span>
+      <h2>320+ tevreden klanten<br>in de regio Brugge.</h2>
+    </div>
+    <div class="aggregate" data-reveal>
+      <div>
+        <div class="agg-score-big">4.9</div>
+        <div class="agg-stars">★★★★★</div>
+        <div class="agg-count">Uit 320+ geverifieerde beoordelingen</div>
+      </div>
+      <div class="platform-rows">
+        <div class="platform-row">
+          <span class="platform-name">Google</span>
+          <div class="platform-bar-bg"><div class="platform-bar" data-width="96%"></div></div>
+          <span class="platform-score">4.9</span>
+        </div>
+        <div class="platform-row">
+          <span class="platform-name">Facebook</span>
+          <div class="platform-bar-bg"><div class="platform-bar" data-width="92%"></div></div>
+          <span class="platform-score">4.8</span>
+        </div>
+        <div class="platform-row">
+          <span class="platform-name">Trustpilot</span>
+          <div class="platform-bar-bg"><div class="platform-bar" data-width="98%"></div></div>
+          <span class="platform-score">5.0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reviews-marquee">
+    <div class="reviews-track">
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Om 23u gebeld wegens een gesprongen pijp. Loodgieter was er na 40 minuten. Kalm, professioneel, opgelost in twee uur. Prijs exact zoals afgesproken. Ik bel nooit iemand anders."</p>
+        <div class="review-author"><strong>Lore V.</strong><span>Brugge · Noodoproep</span></div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Drie andere bedrijven hadden het lek niet gevonden. Dropwork vond het in 20 minuten met een sensor. Zelfde dag hersteld. Ongelooflijk vakwerk."</p>
+        <div class="review-author"><strong>Pieter D.</strong><span>Gent · Lekdetectie</span></div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Onze ketel viel uit op Kerstavond. Ze namen meteen op, waren eerlijk dat het mogelijk de volgende ochtend zou zijn, en stonden om 7u aan de deur. Opgelost voor de middag."</p>
+        <div class="review-author"><strong>Marie-Claire W.</strong><span>Brugge · Ketelreparatie</span></div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Heel netjes en snel gewerkt. Vloerprotectie gelegd voor ze begonnen, alles opgeruimd achteraf. De prijs was exact wat ze telefonisch hadden gezegd."</p>
+        <div class="review-author"><strong>Thomas B.</strong><span>Kortrijk · Badkamer</span></div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Oprecht verbaasd over hoe professioneel dit verliep. Twee eerdere loodgieters waren te laat, vaag over prijs en lieten een bende achter. Dit was precies het tegenovergestelde."</p>
+        <div class="review-author"><strong>Saar M.</strong><span>Brugge · Afvoer</span></div>
+      </div>
+      <!-- Doubled for seamless loop -->
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Om 23u gebeld wegens een gesprongen pijp. Loodgieter was er na 40 minuten. Kalm, professioneel, opgelost in twee uur. Prijs exact zoals afgesproken."</p>
+        <div class="review-author"><strong>Lore V.</strong><span>Brugge · Noodoproep</span></div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Drie andere bedrijven hadden het lek niet gevonden. Dropwork vond het in 20 minuten. Zelfde dag hersteld. Ongelooflijk vakwerk."</p>
+        <div class="review-author"><strong>Pieter D.</strong><span>Gent · Lekdetectie</span></div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Onze ketel viel uit op Kerstavond. Ze namen meteen op, stonden om 7u aan de deur. Opgelost voor de middag. Ongelooflijk."</p>
+        <div class="review-author"><strong>Marie-Claire W.</strong><span>Brugge · Ketelreparatie</span></div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Heel netjes en snel. Vloerprotectie voor aanvang, alles opgeruimd na afloop. Prijs was exact wat ze zeiden."</p>
+        <div class="review-author"><strong>Thomas B.</strong><span>Kortrijk · Badkamer</span></div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Twee eerdere loodgieters waren te laat, vaag over prijs en lieten een bende achter. Dit was precies het tegenovergestelde."</p>
+        <div class="review-author"><strong>Saar M.</strong><span>Brugge · Afvoer</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════ WHY US ═══════════ -->
+<section class="why-section section-alt" id="waarom">
+  <div class="wrap">
+    <div class="section-header" data-reveal>
+      <span class="eyebrow">Waarom Dropwork</span>
+      <h2>We bouwden de loodgieter die we zelf hadden gewild.</h2>
+      <p>Onbetrouwbare prijzen, trage aankomst en slordig werk — we losten alle drie op.</p>
+    </div>
+    <div class="why-grid">
+      <div class="why-card" data-reveal data-delay="1">
+        <div class="why-number">01</div>
+        <h3>45 Minuten Aankomsttijd, Gegarandeerd</h3>
+        <p>We hebben bestelwagens in uw buurt. Als we 45 minuten beloven en te laat komen, krijgt u 10% korting op uw factuur. Geen uitzonderingen, geen excuses.</p>
+        <div class="why-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Getimed &amp; gevolgd</div>
+      </div>
+      <div class="why-card" data-reveal data-delay="2">
+        <div class="why-number">02</div>
+        <h3>Prijs Akkoord Vóór Start van Werken</h3>
+        <p>U krijgt een schriftelijke prijs ter plaatse vóór er iets begint. Dat cijfer verandert niet. Niet nadat de muur open is, niet na iets anders.</p>
+        <div class="why-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Schriftelijk &amp; bindend</div>
+      </div>
+      <div class="why-card" data-reveal data-delay="3">
+        <div class="why-number">03</div>
+        <h3>Opgelost of Gratis — We Menen het</h3>
+        <p>Als we het bij het eerste bezoek niet kunnen oplossen binnen de offerte, bent u ons niets verschuldigd. We komen terug met een plan, zonder extra kosten.</p>
+        <div class="why-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Risicovrije garantie</div>
+      </div>
+      <div class="why-card" data-reveal data-delay="4">
+        <div class="why-number">04</div>
+        <h3>Beschikbaar Elk Uur van Elke Dag</h3>
+        <p>24/7 betekent geen slaperig wachtnummer. Het betekent een echte loodgieter, volledig uitgerust, aan uw deur. Elke nacht, elk weekend, elke feestdag.</p>
+        <div class="why-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Lokaal &amp; altijd bereikbaar</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════ FINAL CTA ════════ -->
+<section class="cta-section" id="contact">
+  <div class="wrap">
+    <div class="cta-inner">
+      <div data-reveal>
+        <h2>Hebt u nu een loodgieter nodig?</h2>
+        <p class="cta-sub">Waterschade verdubbelt elke 24 uur. Eén telefoontje stuurt een gecertificeerde loodgieter uw kant op.</p>
+        <div class="cta-actions">
+          <a href="tel:+3250000000" class="btn-cta-call">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 1.04h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 15.92z"/></svg>
+            Bel Nu — Gratis
+          </a>
+          <button class="btn-cta-copy" id="copyNumBtn" onclick="copyPhone(this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            <span>Kopieer nummer</span>
+          </button>
+        </div>
+        <div class="cta-assurances">
+          <div class="assurance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Geen verplichting</div>
+          <div class="assurance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Geen voorrijkosten</div>
+          <div class="assurance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> 45 min aankomst</div>
+          <div class="assurance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Vaste prijs offerte</div>
+        </div>
+      </div>
+      <div class="cta-cards">
+        <div class="cta-card">
+          <div class="cta-card-title">Gemiddelde aankomsttijd</div>
+          <div class="cta-card-value">45 min</div>
+          <div class="cta-card-sub">Of 10% korting op uw factuur — gegarandeerd</div>
+        </div>
+        <div class="cta-card">
+          <div class="cta-card-title">Onze belofte</div>
+          <div class="cta-card-value">Gratis</div>
+          <div class="cta-card-sub">Als we het niet oplossen bij het eerste bezoek, betaalt u niets</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════ FOOTER ═══════════ -->
+<footer>
+  <div class="wrap">
+    <div class="footer-inner">
+      <div>
+        <div class="footer-logo">
+          <div class="footer-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 2C12 2 4 10 4 15a8 8 0 0016 0c0-5-8-13-8-13z"/></svg></div>
+          Dropwork
+        </div>
+        <div class="footer-tagline">Gecertificeerde loodgieters — Brugge &amp; omgeving</div>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <span class="footer-col-title">Contact</span>
+          <a href="tel:+3250000000" class="phone">+32 500 00 00</a>
+          <a href="mailto:info@dropwork.be">info@dropwork.be</a>
+          <p>Brugge, België</p>
+        </div>
+        <div class="footer-col">
+          <span class="footer-col-title">Openingstijden</span>
+          <p>Ma – Vr: 07:00 – 20:00</p>
+          <p>Za – Zo: 08:00 – 18:00</p>
+          <p class="emergency">Spoed: 24/7</p>
+        </div>
+        <div class="footer-col">
+          <span class="footer-col-title">Diensten</span>
+          <a href="#">Noodloodgieters</a>
+          <a href="#">Lekdetectie</a>
+          <a href="#">Afvoer ontstopping</a>
+          <a href="#">Ketelonderhoud</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-legal">© 2025 Dropwork. Alle rechten voorbehouden.</span>
+      <div class="footer-legal-row">
+        <span class="footer-legal">Gecertificeerd &amp; verzekerd</span>
+        <span class="footer-legal">Vaste prijs garantie</span>
+        <span class="footer-legal">BTW BE 0000.000.000</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ── Scroll: progress bar + nav + sticky banner ───────────── */
+const progressBar = document.getElementById('progress-bar');
+const nav = document.getElementById('nav');
+const stickyBar = document.querySelector('.sticky-mobile');
+window.addEventListener('scroll', () => {
+  const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+  progressBar.style.width = (scrollable > 0 ? window.scrollY / scrollable * 100 : 0) + '%';
+  nav.classList.toggle('scrolled', window.scrollY > 60);
+  if (stickyBar) stickyBar.classList.toggle('show', window.scrollY > 420);
+}, { passive: true });
+
+/* ── Copy phone number ────────────────────────────────────── */
+function copyPhone(btn) {
+  navigator.clipboard.writeText('+3250000000').then(() => {
+    btn.classList.add('copied');
+    btn.querySelector('span').textContent = 'Gekopieerd!';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.querySelector('span').textContent = 'Kopieer nummer';
+    }, 2200);
+  });
+}
+
+/* ── Scroll reveal ────────────────────────────────────────── */
+const revealObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revealObs.unobserve(e.target); } });
+}, { threshold: 0.12 });
+document.querySelectorAll('[data-reveal]').forEach(el => revealObs.observe(el));
+
+/* ── Counter animation ────────────────────────────────────── */
+const counterObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const el = e.target, numEl = el.querySelector('.trust-number') || el;
+    const target = parseInt(el.dataset.count, 10);
+    const suffix = el.dataset.suffix || '';
+    if (!target) return;
+    const dur = 1400, start = performance.now();
+    (function tick(now) {
+      const p = Math.min((now - start) / dur, 1), eased = 1 - Math.pow(1 - p, 3);
+      numEl.textContent = Math.round(eased * target).toLocaleString('nl-BE') + suffix;
+      if (p < 1) requestAnimationFrame(tick);
+    })(start);
+    counterObs.unobserve(el);
+  });
+}, { threshold: 0.25 });
+document.querySelectorAll('[data-count]').forEach(el => counterObs.observe(el));
+
+/* ── Platform bars ────────────────────────────────────────── */
+const barObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    e.target.querySelectorAll('.platform-bar').forEach(b => { b.style.width = b.dataset.width; });
+    barObs.unobserve(e.target);
+  });
+}, { threshold: 0.3 });
+document.querySelectorAll('.aggregate').forEach(el => barObs.observe(el));
+
+/* ── Service card mouse-follow parallax ──────────────────── */
+document.querySelectorAll('.service-card').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const r = card.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - 0.5;
+    const y = (e.clientY - r.top) / r.height - 0.5;
+    card.style.transform = `perspective(700px) rotateX(${-y * 7}deg) rotateY(${x * 7}deg)`;
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transition = 'transform .5s var(--ease), box-shadow .3s var(--ease)';
+    card.style.transform = '';
+    setTimeout(() => card.style.transition = '', 500);
+  });
+  card.addEventListener('mouseenter', () => { card.style.transition = 'box-shadow .3s var(--ease)'; });
+});
+
+/* ── Why-grid animated connecting line ────────────────────── */
+const whyGrid = document.querySelector('.why-grid');
+if (whyGrid) {
+  const lineObs = new IntersectionObserver(([e]) => {
+    if (e.isIntersecting) { whyGrid.classList.add('line-active'); lineObs.disconnect(); }
+  }, { threshold: 0.25 });
+  lineObs.observe(whyGrid);
+}
+
+/* ── Rotating words ───────────────────────────────────────── */
+const words = ['lekken','verstoppingen','toiletten','kranen','spoedproblemen'];
+let wi = 0;
+const wordEl = document.getElementById('rotating-word');
+setInterval(() => {
+  wordEl.style.animation = 'wordOut .28s cubic-bezier(.4,0,1,1) forwards';
+  setTimeout(() => {
+    wi = (wi + 1) % words.length;
+    wordEl.textContent = words[wi];
+    wordEl.style.animation = 'wordIn .42s var(--ease) forwards';
+  }, 280);
+}, 2000);
+
+/* ── Before/After Slider ──────────────────────────────────── */
+const captions = [
+  { title: 'Badkamer Installatie', meta: 'Opgelost in <span class="caption-time-highlight">4u</span> · Brugge' },
+  { title: 'Afvoer Ontstopping',   meta: 'Opgelost in <span class="caption-time-highlight">1u</span> · Gent'   },
+  { title: 'Kraan Vervanging',     meta: 'Opgelost in <span class="caption-time-highlight">2u</span> · Brugge' },
+];
+const shell = document.getElementById('sliderShell');
+const divider = document.getElementById('sliderDivider');
+const handle = document.getElementById('sliderHandle');
+const slides = Array.from(document.querySelectorAll('.slide'));
+const tabs = Array.from(document.querySelectorAll('.proof-tab'));
+const captionTitle = document.getElementById('captionTitle');
+const captionMeta  = document.getElementById('captionMeta');
+if (!shell || !divider || !handle || !captionTitle) { /* slider not in DOM, skip */ }
+
+let cur = 0, pos = 20, dragging = false;
+let animFrame, animStart, autoPlay = true, resumeTimer;
+const HALF = 3200;
+
+function clamp(v,lo,hi){ return Math.min(hi,Math.max(lo,v)); }
+function setPos(p){
+  pos = clamp(p, 2, 98);
+  divider.style.left = pos + '%';
+  slides[cur].querySelector('.slide-after').style.clipPath = `inset(0 ${100-pos}% 0 0)`;
+}
+function smoothstep(t){ return t*t*(3-2*t); }
+function autoTick(ts){
+  if(!autoPlay) return;
+  if(!animStart) animStart = ts;
+  const phase = (ts-animStart) % (HALF*2);
+  const t = phase < HALF ? phase/HALF : (HALF*2-phase)/HALF;
+  setPos(15 + smoothstep(t)*70);
+  animFrame = requestAnimationFrame(autoTick);
+}
+function startAuto(){ autoPlay=true; animStart=null; animFrame=requestAnimationFrame(autoTick); }
+function stopAuto(){ autoPlay=false; cancelAnimationFrame(animFrame); animStart=null; clearTimeout(resumeTimer); }
+function scheduleResume(){ clearTimeout(resumeTimer); resumeTimer=setTimeout(startAuto, 2500); }
+
+function switchSlide(idx){
+  slides[cur].classList.remove('active'); tabs[cur].classList.remove('active');
+  cur = idx;
+  slides[cur].classList.add('active'); tabs[cur].classList.add('active');
+  captionTitle.textContent = captions[idx].title;
+  captionMeta.innerHTML = captions[idx].meta;
+  animStart = null;
+}
+
+if (shell && divider && handle && captionTitle) {
+  slides.forEach(s => { const a = s.querySelector('.slide-after'); if(a) a.style.clipPath = 'inset(0 80% 0 0)'; });
+  captionTitle.textContent = captions[0].title;
+  captionMeta.innerHTML = captions[0].meta;
+  tabs.forEach((t,i) => t.addEventListener('click', () => switchSlide(i)));
+
+  function getPct(clientX){ const r=shell.getBoundingClientRect(); return (clientX-r.left)/r.width*100; }
+  handle.addEventListener('mousedown', e=>{ dragging=true; stopAuto(); e.preventDefault(); });
+  window.addEventListener('mousemove', e=>{ if(dragging) setPos(getPct(e.clientX)); });
+  window.addEventListener('mouseup', ()=>{ if(!dragging) return; dragging=false; scheduleResume(); });
+  handle.addEventListener('touchstart', e=>{ dragging=true; stopAuto(); e.preventDefault(); }, {passive:false});
+  window.addEventListener('touchmove', e=>{ if(!dragging) return; setPos(getPct(e.touches[0].clientX)); e.preventDefault(); }, {passive:false});
+  window.addEventListener('touchend', ()=>{ if(!dragging) return; dragging=false; scheduleResume(); });
+  shell.addEventListener('click', e=>{ if(e.target===handle||handle.contains(e.target)) return; stopAuto(); setPos(getPct(e.clientX)); scheduleResume(); });
+  startAuto();
+}
+</script>
+</body>
+</html>
