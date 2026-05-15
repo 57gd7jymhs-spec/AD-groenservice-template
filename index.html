@@ -241,10 +241,13 @@ h1.hero-h1 { font-size:clamp(3rem,7.5vw,5rem)!important;font-weight:900!importan
 @media(max-width:640px){
   /* Full-screen hero on mobile — keeps marquee + trust cards below fold */
   .hero { min-height:100svh; min-height:100dvh; padding-top:5.5rem; padding-bottom:2rem; justify-content:flex-start; }
+  .hero-inner { flex-direction:column; align-items:flex-start; }
+  .info-card { display:none; }
   .trust-badge { margin-bottom:1.25rem; }
-  .hero-sub { margin-bottom:1.75rem; }
-  .cta-row { margin-bottom:2rem; }
-  .trust-row { flex-wrap:wrap; gap:.75rem 1.5rem; }
+  .hero-sub { display:none; }
+  .cta-row { margin-bottom:0; }
+  .trust-row { display:none; }
+  .btn-phone { display:none; }
   .rotating-wrap { min-width:auto; max-width:100%; overflow:hidden; }
   h1.hero-h1 { font-size:clamp(1.875rem,9vw,3.5rem)!important; }
 }
@@ -324,7 +327,7 @@ h1.hero-h1 { font-size:clamp(3rem,7.5vw,5rem)!important;font-weight:900!importan
 .slide { position:absolute;inset:0;display:none; }
 .slide.active { display:block; }
 .slide-before,.slide-after { position:absolute;inset:0;background-size:cover;background-position:center; }
-.slide-after { clip-path:inset(0 50% 0 0); }
+.slide-after { clip-path:inset(0 0 0 50%); }
 .slide-label { position:absolute;bottom:1rem;padding:.375rem .875rem;border-radius:.5rem;font-size:.75rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;background:rgba(0,0,0,.5);color:#fff;backdrop-filter:blur(4px); }
 .slide-label-before { left:1rem; }
 .slide-label-after { right:1rem; }
@@ -635,7 +638,7 @@ footer { background:#0A1540;padding:3.5rem 1.5rem 2rem; }
 
 <!-- ═══════════════════════════════════════ HERO ═══════════ -->
 <section class="hero" id="hero">
-  <video id="hero-video" class="hero-video" autoplay muted playsinline aria-hidden="true">
+  <video id="hero-video" class="hero-video" autoplay muted playsinline preload="auto" aria-hidden="true">
     <source src="https://videos.pexels.com/video-files/9890450/9890450-hd_1920_1080_30fps.mp4" type="video/mp4">
     <source src="https://videos.pexels.com/video-files/9890453/9890453-hd_1920_1080_30fps.mp4" type="video/mp4">
     <source src="https://videos.pexels.com/video-files/7584762/7584762-uhd_2560_1440_25fps.mp4" type="video/mp4">
@@ -1259,7 +1262,7 @@ function clamp(v,lo,hi){ return Math.min(hi,Math.max(lo,v)); }
 function setPos(p){
   pos = clamp(p, 2, 98);
   divider.style.left = pos + '%';
-  slides[cur].querySelector('.slide-after').style.clipPath = `inset(0 ${100-pos}% 0 0)`;
+  slides[cur].querySelector('.slide-after').style.clipPath = `inset(0 0 0 ${pos}%)`;
 }
 function smoothstep(t){ return t*t*(3-2*t); }
 function autoTick(ts){
@@ -1284,7 +1287,7 @@ function switchSlide(idx){
 }
 
 if (shell && divider && handle && captionTitle) {
-  slides.forEach(s => { const a = s.querySelector('.slide-after'); if(a) a.style.clipPath = 'inset(0 80% 0 0)'; });
+  slides.forEach(s => { const a = s.querySelector('.slide-after'); if(a) a.style.clipPath = 'inset(0 0 0 20%)'; });
   captionTitle.textContent = captions[0].title;
   captionMeta.innerHTML = captions[0].meta;
   tabs.forEach((t,i) => t.addEventListener('click', () => switchSlide(i)));
@@ -1690,7 +1693,7 @@ if (shell && divider && handle && captionTitle) {
 </script>
 
 <script>
-/* Hero video montage — cycles through plumber clips */
+/* Hero video montage — hard cut, background preload */
 (function(){
   var clips=[
     'https://videos.pexels.com/video-files/9890450/9890450-hd_1920_1080_30fps.mp4',
@@ -1701,32 +1704,32 @@ if (shell && divider && handle && captionTitle) {
   var v=document.getElementById('hero-video');
   if(!v) return;
   var idx=0;
-  v.src=clips[0];
-  v.load();
+
+  /* Preload all clips in the background during the page preloader window */
+  var pool=clips.map(function(src,i){
+    var el=document.createElement('video');
+    el.src=src; el.preload='auto'; el.muted=true;
+    el.load();
+    return el;
+  });
+
+  v.src=clips[0]; v.load();
   v.play().catch(function(){});
 
+  var switching=false;
   v.addEventListener('timeupdate',function(){
-    if(v.duration&&(v.duration-v.currentTime)<1.5&&!v._switching){
-      v._switching=true;
+    if(v.duration&&(v.duration-v.currentTime)<1.2&&!switching){
+      switching=true;
       idx=(idx+1)%clips.length;
-      var next=clips[idx];
-      /* Fade via overlay opacity */
-      var ov=document.querySelector('.hero-video-overlay');
-      if(ov){ ov.style.transition='background .8s'; ov.style.background='rgba(13,30,92,.97)'; }
-      setTimeout(function(){
-        v.src=next; v.load(); v.play().catch(function(){});
-        v._switching=false;
-        if(ov){
-          ov.style.background='';
-          setTimeout(function(){ ov.style.transition=''; },900);
-        }
-      },600);
+      v.src=clips[idx]; v.load();
+      v.play().catch(function(){});
+      setTimeout(function(){ switching=false; },800);
     }
   });
-  /* On error, try next clip */
   v.addEventListener('error',function(){
+    if(switching) return;
     idx=(idx+1)%clips.length;
-    if(idx!==0){ v.src=clips[idx]; v.load(); v.play().catch(function(){}); }
+    v.src=clips[idx]; v.load(); v.play().catch(function(){});
   });
 })();
 </script>
