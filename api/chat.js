@@ -55,7 +55,7 @@ module.exports = async function handler(req, res) {
 
     const data = await response.json();
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) throw new Error('empty_response');
+    if (!text) return res.status(500).json({ error: 'empty_response', gemini: data });
 
     res.json({ reply: text });
   } catch (e) {
