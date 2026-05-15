@@ -1612,7 +1612,7 @@ if (shell && divider && handle && captionTitle) {
       var data=await res.json();
       if(data.reply){
         conversationHistory.push({role:'assistant',content:data.reply});
-        hideTypingAndShow(data.reply,false);
+        hideTypingAndShow(data.reply,true);
       } else {
         throw new Error('no reply');
       }
