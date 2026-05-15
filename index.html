@@ -29,7 +29,7 @@ body { margin:0; background:var(--bg); color:var(--ink); }
 #page-loader {
   position:fixed; inset:0; z-index:99999;
   background:var(--navy);
-  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2rem;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1.75rem;
   clip-path:circle(150% at 50% 50%);
   transition:clip-path .9s cubic-bezier(0.7,0,0.3,1);
 }
@@ -37,82 +37,44 @@ body { margin:0; background:var(--bg); color:var(--ink); }
   clip-path:circle(0% at 50% 50%);
   pointer-events:none;
 }
-.ld-scene { position:relative; width:200px; height:220px; }
-/* Falling drop body */
-.ld-drop {
-  position:absolute; left:50%; margin-left:-10px;
-  width:20px; height:20px; background:#fff; border-radius:50%;
-  top:0;
-  animation:ldDrip 2s cubic-bezier(1,0,.91,.19) infinite;
+.ld-logo-wrap {
+  position:relative;
+  width:96px; height:96px;
+  background:#fff; border-radius:1.5rem;
+  display:flex; align-items:center; justify-content:center;
+  padding:14px;
+  box-shadow:0 24px 64px rgba(0,0,0,.4);
+  animation:ldLogoReveal .7s cubic-bezier(0.16,1,0.3,1) both;
 }
-/* Teardrop triangle tip */
-.ld-drop::before {
-  content:''; position:absolute;
-  width:0; height:0;
-  border-left:10px solid transparent;
-  border-right:10px solid transparent;
-  border-bottom:30px solid #fff;
-  top:-22px; left:0;
+.ld-logo-wrap img { width:100%; height:100%; object-fit:contain; display:block; }
+.ld-logo-wrap::after {
+  content:''; position:absolute; inset:-12px;
+  border-radius:2.25rem;
+  background:rgba(24,71,237,.35);
+  animation:ldGlow 1s .7s ease-out both;
+  pointer-events:none;
 }
-@keyframes ldDrip {
-  from { top:0; }
-  to   { top:160px; }
+@keyframes ldLogoReveal {
+  from { opacity:0; transform:scale(0.2) rotate(-14deg); }
+  to   { opacity:1; transform:scale(1) rotate(0deg); }
 }
-/* Oval ripple — content-box keeps width:2px truly tiny at start */
-.ld-wave {
-  box-sizing:content-box;
-  position:absolute; left:50%; transform:translateX(-50%);
-  top:168px; width:2px; height:1px; opacity:0;
-  border:7px solid rgba(255,255,255,.9);
-  border-radius:300px / 150px;
-  animation:ldRipple 2s ease-out 2s infinite;
-}
-.ld-wave::after {
-  box-sizing:content-box;
-  content:''; position:absolute; opacity:0;
-  top:-5px; left:-5px; width:2px; height:1px;
-  border:5px solid rgba(255,255,255,.7);
-  border-radius:300px / 150px;
-  animation:ldRipple2 2s ease-out 2s infinite;
-}
-@keyframes ldRipple {
-  from { width:2px; height:1px; border-width:7px; opacity:1; }
-  to   { width:600px; height:300px; border-width:1px; top:68px; opacity:0; }
-}
-@keyframes ldRipple2 {
-  0%   { opacity:1; }
-  50%  { opacity:0; }
-  100% { width:200px; height:100px; border-width:1px; top:100px; left:200px; }
+@keyframes ldGlow {
+  0%   { transform:scale(1); opacity:.6; }
+  100% { transform:scale(1.7); opacity:0; }
 }
 .loader-wordmark {
   display:flex; align-items:center; gap:.625rem;
   color:#fff; font-size:1.375rem; font-weight:800; letter-spacing:-.02em;
-  opacity:0; animation:ldWordIn .5s .3s var(--ease) forwards;
+  opacity:0; animation:ldWordIn .45s .55s var(--ease) forwards;
 }
 .loader-wordmark span { color:rgba(255,255,255,.4); font-weight:400; font-size:.875rem; margin-left:.25rem; }
-/* Logo badge — appears at drop impact point */
-.ld-logo-badge {
-  position:absolute; left:50%; transform:translateX(-50%);
-  top:134px; /* center at 170px = drop landing */
-  width:72px; height:72px;
-  background:#fff; border-radius:1rem; padding:8px;
-  display:flex; align-items:center; justify-content:center;
-  opacity:0;
-  animation:ldLogoIn .45s 1.9s cubic-bezier(0.16,1,0.3,1) forwards;
-  box-shadow:0 12px 40px rgba(0,0,0,.32);
-}
-.ld-logo-badge img { width:100%; height:100%; object-fit:contain; }
-@keyframes ldLogoIn {
-  from { opacity:0; transform:translateX(-50%) scale(0.4); }
-  to   { opacity:1; transform:translateX(-50%) scale(1); }
-}
 @keyframes ldWordIn {
-  from { opacity:0; transform:translateY(6px); }
+  from { opacity:0; transform:translateY(8px); }
   to   { opacity:1; transform:none; }
 }
 @media(prefers-reduced-motion:reduce) {
   #page-loader.hide { clip-path:circle(150%); opacity:0; transition:opacity .3s; }
-  .ld-drop,.ld-wave { animation:none; opacity:0; }
+  .ld-logo-wrap { animation:none; opacity:1; }
 }
 
 /* ── Progress bar ─────────────────────────────────────────── */
@@ -194,10 +156,41 @@ body { margin:0; background:var(--bg); color:var(--ink); }
 
 /* ── Hero ─────────────────────────────────────────────────── */
 .hero {
-  min-height:100vh; background:var(--bg);
+  min-height:100vh; background:var(--navy);
   display:flex;flex-direction:column;justify-content:center;
   padding:7.5rem 1.5rem 4rem; position:relative;overflow:hidden;
 }
+/* Video background */
+.hero-video {
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;z-index:0;pointer-events:none;
+}
+.hero-video-overlay {
+  position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(
+    135deg,
+    rgba(13,30,92,.85) 0%,
+    rgba(13,30,92,.65) 45%,
+    rgba(0,0,0,.5) 100%
+  );
+}
+/* Text + UI overrides for dark hero */
+.hero h1.hero-h1 { color:#fff!important; }
+.hero .hero-sub { color:rgba(255,255,255,.72); }
+.hero .trust-badge {
+  background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.15);
+  color:#fff;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+}
+.hero .trust-pill { color:rgba(255,255,255,.75); }
+.hero .trust-pill svg { color:rgba(255,255,255,.9); }
+.hero .btn-secondary {
+  background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.28);
+  color:#fff;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+}
+.hero .btn-secondary:hover { background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.6);color:#fff;transform:translateY(-2px); }
+.hero .grid-bg { background-image:linear-gradient(rgba(255,255,255,1) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,1) 1px,transparent 1px);opacity:.04; }
+.hero .orb-1 { background:rgba(24,71,237,.15); }
+.hero .orb-2 { background:rgba(56,189,248,.1); }
 .orb { position:absolute;border-radius:50%;filter:blur(56px);pointer-events:none; }
 .orb-1 { top:-10rem;right:-10rem;width:32rem;height:32rem;background:rgba(24,71,237,.07); }
 .orb-2 { bottom:-8rem;left:-8rem;width:26rem;height:26rem;background:rgba(56,189,248,.08); }
@@ -601,12 +594,8 @@ footer { background:#0A1540;padding:3.5rem 1.5rem 2rem; }
 
 <!-- Page loader -->
 <div id="page-loader" aria-hidden="true">
-  <div class="ld-scene">
-    <div class="ld-drop"></div>
-    <div class="ld-wave"></div>
-    <div class="ld-logo-badge">
-      <img src="images/LOGO/LOGO negative.png" alt="Dropwork">
-    </div>
+  <div class="ld-logo-wrap">
+    <img src="images/LOGO/LOGO negative.png" alt="Dropwork">
   </div>
   <div class="loader-wordmark">
     Dropwork <span>Loodgieters</span>
@@ -646,6 +635,12 @@ footer { background:#0A1540;padding:3.5rem 1.5rem 2rem; }
 
 <!-- ═══════════════════════════════════════ HERO ═══════════ -->
 <section class="hero" id="hero">
+  <video id="hero-video" class="hero-video" autoplay muted playsinline aria-hidden="true">
+    <source src="https://videos.pexels.com/video-files/9890450/9890450-hd_1920_1080_30fps.mp4" type="video/mp4">
+    <source src="https://videos.pexels.com/video-files/9890453/9890453-hd_1920_1080_30fps.mp4" type="video/mp4">
+    <source src="https://videos.pexels.com/video-files/7584762/7584762-uhd_2560_1440_25fps.mp4" type="video/mp4">
+  </video>
+  <div class="hero-video-overlay"></div>
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
   <div class="grid-bg"></div>
@@ -1695,6 +1690,48 @@ if (shell && divider && handle && captionTitle) {
   sendBtn.addEventListener('click',function(){sendMsg(inp.value);});
   inp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();sendMsg(inp.value);}});
   document.addEventListener('keydown',function(e){if(e.key==='Escape'&&opened) togglePanel();});
+})();
+</script>
+
+<script>
+/* Hero video montage — cycles through plumber clips */
+(function(){
+  var clips=[
+    'https://videos.pexels.com/video-files/9890450/9890450-hd_1920_1080_30fps.mp4',
+    'https://videos.pexels.com/video-files/9890453/9890453-hd_1920_1080_30fps.mp4',
+    'https://videos.pexels.com/video-files/15959642/15959642-uhd_2560_1440_60fps.mp4',
+    'https://videos.pexels.com/video-files/7584762/7584762-uhd_2560_1440_25fps.mp4'
+  ];
+  var v=document.getElementById('hero-video');
+  if(!v) return;
+  var idx=0;
+  v.src=clips[0];
+  v.load();
+  v.play().catch(function(){});
+
+  v.addEventListener('timeupdate',function(){
+    if(v.duration&&(v.duration-v.currentTime)<1.5&&!v._switching){
+      v._switching=true;
+      idx=(idx+1)%clips.length;
+      var next=clips[idx];
+      /* Fade via overlay opacity */
+      var ov=document.querySelector('.hero-video-overlay');
+      if(ov){ ov.style.transition='background .8s'; ov.style.background='rgba(13,30,92,.97)'; }
+      setTimeout(function(){
+        v.src=next; v.load(); v.play().catch(function(){});
+        v._switching=false;
+        if(ov){
+          ov.style.background='';
+          setTimeout(function(){ ov.style.transition=''; },900);
+        }
+      },600);
+    }
+  });
+  /* On error, try next clip */
+  v.addEventListener('error',function(){
+    idx=(idx+1)%clips.length;
+    if(idx!==0){ v.src=clips[idx]; v.load(); v.play().catch(function(){}); }
+  });
 })();
 </script>
 </body>
