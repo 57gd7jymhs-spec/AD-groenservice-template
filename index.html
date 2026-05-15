@@ -181,10 +181,10 @@ h1.hero-h1 { font-size:clamp(3rem,7.5vw,5rem)!important;font-weight:900!importan
 .trust-card { text-align:center;padding:2rem 1.5rem;background:#fff;border-radius:1.25rem;border:1px solid var(--border);box-shadow:0 2px 12px rgba(0,0,0,.04);transition:transform .25s var(--ease),box-shadow .25s var(--ease); }
 .trust-card:hover { transform:translateY(-3px);box-shadow:0 8px 28px rgba(24,71,237,.1); }
 .trust-card svg { display:block;margin:0 auto 1rem;color:var(--blue);width:1.75rem;height:1.75rem; }
-.trust-number { font-size:2.5rem;font-weight:900;color:var(--navy);letter-spacing:-.03em;line-height:1; }
+.trust-number { font-size:2.5rem;font-weight:900;color:var(--navy);letter-spacing:-.03em;line-height:1;white-space:nowrap; }
 .trust-label { font-size:.875rem;color:var(--muted);margin-top:.375rem; }
 @media(max-width:768px){ .trust-grid{grid-template-columns:repeat(2,1fr)} }
-@media(max-width:480px){ .trust-grid{grid-template-columns:repeat(2,1fr);gap:1rem} .trust-card{padding:1.5rem 1rem} }
+@media(max-width:480px){ .trust-grid{grid-template-columns:repeat(2,1fr);gap:1rem} .trust-card{padding:1.5rem 1rem} .trust-number{font-size:1.5rem} }
 
 /* ── Services ─────────────────────────────────────────────── */
 .services-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem;margin-bottom:2.5rem; }
@@ -278,8 +278,7 @@ h1.hero-h1 { font-size:clamp(3rem,7.5vw,5rem)!important;font-weight:900!importan
 .platform-score { width:2rem;text-align:right;font-size:.8125rem;font-weight:700;color:var(--navy); }
 
 .reviews-marquee { margin-top:2.5rem;overflow:hidden; }
-.reviews-track { display:flex;gap:1.5rem;animation:reviewScroll 40s linear infinite;width:max-content; }
-.reviews-track:hover { animation-play-state:paused; }
+.reviews-track { display:flex;gap:1.5rem;animation:reviewScroll 40s linear infinite;width:max-content;translate:var(--scroll-extra,0px); }
 .review-card { flex-shrink:0;width:20rem;background:#fff;border-radius:1.25rem;border:1px solid var(--border);padding:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,.04); }
 .review-stars { color:#FBBF24;font-size:1rem;letter-spacing:.05em;margin-bottom:.875rem; }
 .review-text { font-size:.9375rem;color:var(--ink);line-height:1.65;margin-bottom:1rem; }
@@ -292,8 +291,7 @@ h1.hero-h1 { font-size:clamp(3rem,7.5vw,5rem)!important;font-weight:900!importan
 .why-section { padding:5rem 1.5rem; }
 .why-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:2rem;position:relative; }
 /* Desktop connecting line */
-.why-grid::after { content:'';position:absolute;left:50%;top:2rem;width:2px;height:0;background:linear-gradient(to bottom,var(--blue),rgba(24,71,237,.15));border-radius:2px;transform:translateX(-50%);transition:height 1.4s cubic-bezier(.16,1,.3,1); pointer-events:none; }
-.why-grid.line-active::after { height:calc(100% - 4rem); }
+.why-grid::after { content:'';position:absolute;left:50%;top:2rem;width:2px;height:var(--line-h,0px);background:linear-gradient(to bottom,var(--blue),rgba(24,71,237,.15));border-radius:2px;transform:translateX(-50%);pointer-events:none;z-index:0; }
 .why-card { background:#fff;border-radius:1.25rem;border:1px solid var(--border);padding:2rem;transition:box-shadow .3s var(--ease); }
 .why-card:hover { box-shadow:0 10px 32px rgba(24,71,237,.09); }
 .why-number { display:inline-flex;align-items:center;justify-content:center;width:2rem;height:2rem;border-radius:50%;background:var(--blue);color:#fff;font-size:.8125rem;font-weight:900;letter-spacing:0;line-height:1;margin-bottom:1.25rem;flex-shrink:0; }
@@ -304,10 +302,9 @@ h1.hero-h1 { font-size:clamp(3rem,7.5vw,5rem)!important;font-weight:900!importan
 /* Mobile vertical connector */
 @media(max-width:768px){
   .why-grid { grid-template-columns:1fr; padding-left:2.75rem; }
-  .why-grid::after { left:.875rem; top:1.5rem; height:0; width:2px; transform:none; }
-  .why-grid.line-active::after { height:calc(100% - 3rem); }
+  .why-grid::after { left:.875rem; top:1.5rem; width:2px; transform:none; }
   .why-card { position:relative; }
-  .why-number { position:absolute;left:-2.75rem;top:1.5rem;width:1.75rem;height:1.75rem;background:var(--blue);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:900;letter-spacing:0;margin-bottom:0; }
+  .why-number { position:absolute;left:-2.75rem;top:1.5rem;width:1.75rem;height:1.75rem;background:var(--blue);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:900;letter-spacing:0;margin-bottom:0;z-index:1; }
 }
 
 /* ── Final CTA ────────────────────────────────────────────── */
@@ -926,13 +923,41 @@ document.querySelectorAll('.service-card').forEach(card => {
   card.addEventListener('mouseenter', () => { card.style.transition = 'box-shadow .3s var(--ease)'; });
 });
 
-/* ── Why-grid animated connecting line ────────────────────── */
+/* ── Why-grid scroll-driven connecting line ───────────────── */
 const whyGrid = document.querySelector('.why-grid');
 if (whyGrid) {
-  const lineObs = new IntersectionObserver(([e]) => {
-    if (e.isIntersecting) { whyGrid.classList.add('line-active'); lineObs.disconnect(); }
-  }, { threshold: 0.25 });
-  lineObs.observe(whyGrid);
+  function updateWhyLine() {
+    const rect = whyGrid.getBoundingClientRect();
+    const vh = window.innerHeight;
+    const progress = Math.max(0, Math.min(1, (vh - rect.top) / (rect.height + vh * 0.6)));
+    whyGrid.style.setProperty('--line-h', Math.round(progress * Math.max(0, rect.height - 48)) + 'px');
+  }
+  window.addEventListener('scroll', updateWhyLine, { passive: true });
+  updateWhyLine();
+}
+
+/* ── Reviews scroll parallax + touch behaviour ────────────── */
+const reviewsSection = document.querySelector('.reviews-section');
+const reviewsTrackEl = document.querySelector('.reviews-track');
+if (reviewsSection && reviewsTrackEl) {
+  function updateReviewsParallax() {
+    const rr = reviewsSection.getBoundingClientRect();
+    const vh = window.innerHeight;
+    if (rr.top < vh && rr.bottom > 0) {
+      const p = (vh - rr.top) / (vh + rr.height);
+      reviewsTrackEl.style.setProperty('--scroll-extra', Math.round((0.5 - p) * 120) + 'px');
+    } else {
+      reviewsTrackEl.style.removeProperty('--scroll-extra');
+    }
+  }
+  window.addEventListener('scroll', updateReviewsParallax, { passive: true });
+  let touchMoved = false;
+  reviewsTrackEl.addEventListener('touchstart', () => { touchMoved = false; reviewsTrackEl.style.animationPlayState = 'paused'; }, { passive: true });
+  reviewsTrackEl.addEventListener('touchmove', () => { if (!touchMoved) { touchMoved = true; reviewsTrackEl.style.animationPlayState = 'running'; } }, { passive: true });
+  reviewsTrackEl.addEventListener('touchend', () => { reviewsTrackEl.style.animationPlayState = 'running'; });
+  reviewsTrackEl.addEventListener('touchcancel', () => { reviewsTrackEl.style.animationPlayState = 'running'; });
+  reviewsTrackEl.addEventListener('mouseenter', () => { reviewsTrackEl.style.animationPlayState = 'paused'; });
+  reviewsTrackEl.addEventListener('mouseleave', () => { reviewsTrackEl.style.animationPlayState = 'running'; });
 }
 
 /* ── Rotating words ───────────────────────────────────────── */
