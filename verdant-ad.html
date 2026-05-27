@@ -1,0 +1,3718 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#000000">
+
+<title>Verdant. Tuinaanleg & onderhoud in Brugge.</title>
+<meta name="description" content="Professionele tuinaanleg en onderhoud in Brugge en West-Vlaanderen. Duurzaam, vakkundig, ecologisch. Bel direct.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<style>
+  :root {
+    --bg: #0a1408;
+    --bg-2: #0e2418;
+    --bg-3: #142a1c;
+    --white: #F5F8F0;
+    --text: #FFFFFF;
+    --text-dim: #8b9d7a;
+    --text-dark: #0a1408;
+    --text-dark-dim: #4a5a3a;
+    --lime: #C2DD62;
+    --lime-bright: #d4ed7a;
+    --lime-glow: rgba(194, 221, 98, 0.5);
+    --lime-soft: rgba(194, 221, 98, 0.08);
+    --forest: #1a3a25;
+    --forest-deep: #274029;
+    --moss: #3a6a3f;
+    --border: rgba(194, 221, 98, 0.1);
+    --border-strong: rgba(194, 221, 98, 0.25);
+    --border-light: rgba(10, 20, 8, 0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; cursor: none; overflow-x: hidden; }
+  @media (max-width: 1024px) { html { cursor: auto; } }
+
+  body {
+    font-family: 'Inter Tight', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    overflow-x: hidden;
+    width: 100%;
+    font-weight: 400;
+    font-size: 15px;
+  }
+  img { display: block; max-width: 100%; height: auto; }
+
+  /* ============================================
+     ACCESSIBILITY - FOCUS STATES (WCAG 2.1 AA)
+  ============================================ */
+  /* Reset default outline */
+  :focus { outline: none; }
+
+  /* Visible focus ring for keyboard users only */
+  :focus-visible {
+    outline: 2px solid var(--lime);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+  /* Buttons get a thicker, more obvious ring */
+  .btn:focus-visible,
+  .nav-cta:focus-visible,
+  .mobile-call-bar a:focus-visible {
+    outline: 3px solid var(--lime);
+    outline-offset: 4px;
+    box-shadow: 0 0 0 6px rgba(194, 221, 98, 0.2);
+  }
+  /* On lime backgrounds use dark focus ring */
+  .final-cta :focus-visible,
+  .marquee :focus-visible {
+    outline-color: var(--text-dark);
+    box-shadow: 0 0 0 6px rgba(0, 0, 0, 0.15);
+  }
+  /* FAQ details - clear focus state */
+  .faq-item summary:focus-visible {
+    outline: 2px solid var(--text-dark);
+    outline-offset: 4px;
+    border-radius: 4px;
+  }
+  /* Area chips */
+  .area-chip:focus-visible {
+    outline: 2px solid var(--lime);
+    outline-offset: 3px;
+  }
+  /* Skip link */
+  .skip-link {
+    position: absolute;
+    top: -100px;
+    left: 16px;
+    background: var(--lime);
+    color: var(--bg);
+    padding: 12px 20px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 6px;
+    z-index: 9999;
+    transition: top 0.2s;
+  }
+  .skip-link:focus {
+    top: 16px;
+  }
+
+  /* CURSOR */
+  .cursor-dot, .cursor-blob { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9999; border-radius: 50%; will-change: transform; }
+  .cursor-dot { width: 5px; height: 5px; background: var(--lime); transform: translate(-50%, -50%); mix-blend-mode: difference; }
+  .cursor-blob { width: 32px; height: 32px; border: 1px solid var(--lime); transform: translate(-50%, -50%); transition: width 0.3s, height 0.3s, background 0.3s, border-color 0.3s; mix-blend-mode: difference; }
+  .cursor-blob.hover { width: 64px; height: 64px; background: var(--lime); border-color: transparent; }
+  @media (max-width: 1024px) { .cursor-dot, .cursor-blob { display: none; } }
+
+  /* MOBILE CALL - dubbele actiebalk (bel + whatsapp) */
+  .mobile-call-bar {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 100;
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+  }
+  .mobile-call-bar a {
+    flex: 1;
+    padding: 16px 12px;
+    text-align: center;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    font-family: 'Space Grotesk', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .mobile-call-bar .mc-tel {
+    background: var(--lime);
+    color: var(--bg);
+  }
+  .mobile-call-bar .mc-wa {
+    background: #25D366;
+    color: #fff;
+  }
+  .mobile-call-bar a svg {
+    flex-shrink: 0;
+  }
+
+  /* NAV */
+  .nav { position: fixed; top: 0; left: 0; right: 0; padding: 22px 36px; display: flex; justify-content: space-between; align-items: center; z-index: 50; background: transparent; transition: all 0.4s; }
+  .nav.scrolled { background: rgba(5,5,5,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 14px 36px; border-bottom: 1px solid var(--border); }
+  .nav.on-light { background: rgba(245,245,240,0.92); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-light); }
+  .nav.on-light .logo-text { color: var(--text-dark); }
+  .nav.on-light .logo-text span { color: var(--text-dark-dim); }
+  .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text); }
+  .logo-mark { width: 36px; height: 36px; background: var(--lime); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--bg); position: relative; overflow: hidden; }
+
+  /* ⚡ ANIMATION 1: Logo lightning shimmer */
+  .logo-mark::after {
+    content: ''; position: absolute; inset: -50%;
+    background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.4) 50%, transparent 60%);
+    animation: shimmer 4s ease-in-out infinite;
+  }
+  @keyframes shimmer {
+    0%, 100% { transform: translateX(-100%) translateY(-100%); }
+    50% { transform: translateX(100%) translateY(100%); }
+  }
+  .logo-mark svg { position: relative; z-index: 2; }
+
+  .logo-text { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; letter-spacing: -0.5px; line-height: 1; transition: color 0.4s; }
+  .logo-text span { color: var(--lime); display: block; font-size: 8px; font-weight: 500; font-family: 'JetBrains Mono', monospace; letter-spacing: 2px; margin-top: 3px; }
+
+  .nav-cta { background: var(--lime); color: var(--bg); padding: 11px 20px; text-decoration: none; font-weight: 600; font-size: 12px; display: flex; align-items: center; gap: 8px; transition: all 0.3s; letter-spacing: 0.3px; border: 1px solid var(--lime); border-radius: 100px; }
+  .nav-cta:hover { background: transparent; color: var(--lime); }
+  .nav.on-light .nav-cta:hover { color: var(--text-dark); border-color: var(--text-dark); }
+  .nav-links { display: flex; gap: 36px; list-style: none; margin: 0; padding: 0; }
+  .nav-links a { font-size: 13px; color: var(--text-dim); text-decoration: none; font-family: 'Space Grotesk', sans-serif; font-weight: 500; transition: color 0.2s; letter-spacing: 0.2px; }
+  .nav-links a:hover { color: var(--text); }
+  .nav.on-light .nav-links a { color: var(--text-dark-dim); }
+  .nav.on-light .nav-links a:hover { color: var(--text-dark); }
+
+  /* ============================================
+     HERO
+  ============================================ */
+  .hero { min-height: 100vh; padding: 0; position: relative; overflow: hidden; background: var(--bg); display: flex; align-items: stretch; }
+  .hero-video { position: absolute; inset: 0; z-index: 0; }
+  .hero-video video, .hero-video img { width: 100%; height: 100%; object-fit: cover; }
+  .hero-overlay {
+    position: absolute; inset: 0; z-index: 1;
+    background:
+      linear-gradient(90deg, rgba(5,5,5,0.68) 0%, rgba(5,5,5,0.32) 55%, rgba(5,5,5,0.06) 100%),
+      linear-gradient(180deg, rgba(5,5,5,0.22) 0%, transparent 35%, transparent 58%, rgba(5,5,5,0.88) 100%);
+  }
+  .hero-overlay::after {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center, transparent 35%, rgba(5,5,5,0.18) 100%);
+  }
+
+  /* ⚡ ANIMATION 2: Hero lightning flash overlay */
+  .hero-flash {
+    position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(135deg, transparent 0%, rgba(212,255,38,0.15) 50%, transparent 100%);
+    opacity: 0;
+    pointer-events: none;
+    mix-blend-mode: screen;
+  }
+
+  /* ============================================
+     GRID + MOUSE FOLLOW GLOW
+  ============================================ */
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+    /* CSS variables die JS update voor mouse positie */
+    --mouse-x: 50%;
+    --mouse-y: 50%;
+  }
+
+  /* Basis grid: subtiele lime lijntjes */
+  .hero-grid::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, rgba(212,255,38,0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(212,255,38,0.06) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mix-blend-mode: screen;
+    /* Subtiele scale die de cursor volgt - via transform origin */
+    transform-origin: var(--mouse-x) var(--mouse-y);
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Mouse-follow glow: helderdere lime cirkel rond cursor */
+  .hero-grid::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      circle 280px at var(--mouse-x) var(--mouse-y),
+      rgba(194, 221, 98, 0.15) 0%,
+      rgba(194, 221, 98, 0.08) 25%,
+      transparent 60%
+    );
+    mix-blend-mode: screen;
+    transition: background 0.3s ease;
+  }
+
+  /* On mouse move: heel subtiele scale-up rond cursor */
+  .hero-grid.mouse-active::before {
+    transform: scale(1.02);
+  }
+  /* Corner brackets - blueprint style */
+  .hero-corners {
+    position: absolute;
+    inset: 32px;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .hero-corner {
+    position: absolute;
+    width: 32px; height: 32px;
+    border: 1.5px solid var(--lime);
+    opacity: 0.4;
+  }
+  .hero-corner.tl { top: 0; left: 0; border-right: none; border-bottom: none; }
+  .hero-corner.tr { top: 0; right: 0; border-left: none; border-bottom: none; }
+  .hero-corner.bl { bottom: 0; left: 0; border-right: none; border-top: none; }
+  .hero-corner.br { bottom: 0; right: 0; border-left: none; border-top: none; }
+
+  .hero-content { position: relative; z-index: 2; width: 100%; max-width: 1300px; margin: 0 auto; padding: 140px 5% 160px; display: flex; flex-direction: column; justify-content: center; }
+  .hero-meta { display: flex; gap: 16px; align-items: center; margin-bottom: 36px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--lime); letter-spacing: 2.5px; text-transform: uppercase; opacity: 0; }
+  .hero-meta .dot { width: 7px; height: 7px; background: var(--lime); border-radius: 50%; box-shadow: 0 0 10px var(--lime); animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; box-shadow: 0 0 0 0 var(--lime-glow); } 50% { opacity: 0.6; box-shadow: 0 0 0 8px transparent; } }
+  .hero-meta-divider { width: 1px; height: 12px; background: rgba(255,255,255,0.2); }
+
+  h1 { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: clamp(40px, 7vw, 92px); line-height: 1; letter-spacing: -2.5px; margin-bottom: 36px; max-width: 900px; text-shadow: 0 4px 30px rgba(0,0,0,0.6); }
+  h1 .word-line { display: block; overflow: hidden; padding: 2px 0; }
+  h1 .word { display: inline-block; transform: translateY(110%); }
+  h1 .lime { color: var(--lime); }
+
+  /* SVG outline classes verwijderd in v14 - niet meer gebruikt */
+
+  .hero-sub { font-size: clamp(15px, 1.3vw, 18px); color: rgba(255,255,255,0.85); margin-bottom: 44px; max-width: 520px; line-height: 1.6; opacity: 0; text-shadow: 0 2px 16px rgba(0,0,0,0.5); }
+  .cta-group { display: flex; gap: 12px; flex-wrap: wrap; opacity: 0; }
+
+  .btn {
+    position: relative;
+    padding: 16px 32px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: 0.3px;
+    border: 1px solid;
+    overflow: hidden;
+    border-radius: 100px;
+    transition: color 0.3s, border-color 0.3s, background-color 0.3s;
+    will-change: transform;
+  }
+  .btn > * {
+    position: relative;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    transform: translateY(101%);
+    transition: transform 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+    pointer-events: none;
+  }
+  .btn:hover::before { transform: translateY(0); }
+
+  /* WHATSAPP BUTTON - green CTA, gelijke status als bel */
+  .btn-whatsapp {
+    background: #25D366;
+    color: #fff;
+    border-color: #25D366;
+  }
+  .btn-whatsapp::before { background: #1ea952; }
+  .btn-whatsapp:hover {
+    color: #fff;
+    border-color: #1ea952;
+  }
+  /* On lime backgrounds (final CTA) */
+  .final-cta .btn-whatsapp {
+    background: #fff;
+    color: #25D366;
+    border-color: #fff;
+  }
+  .final-cta .btn-whatsapp::before { background: #25D366; }
+  .final-cta .btn-whatsapp:hover { color: #fff; border-color: #25D366; }
+
+  /* PRIMARY: lime → zwart bij hover (tekst wordt lime) */
+  .btn-primary {
+    background: var(--lime);
+    color: var(--bg);
+    border-color: var(--lime);
+  }
+  .btn-primary::before { background: var(--bg); }
+  .btn-primary:hover { color: var(--lime); }
+
+  /* SECONDARY: transparant → wit bij hover (tekst wordt zwart) */
+  .btn-secondary {
+    background: rgba(0,0,0,0.3);
+    color: var(--text);
+    border-color: rgba(255,255,255,0.3);
+  }
+  .btn-secondary::before { background: var(--text); }
+  .btn-secondary:hover {
+    color: var(--bg);
+    border-color: var(--text);
+  }
+
+  /* DARK-LIGHT (op lime achtergrond): zwart → wit bij hover (tekst wordt zwart) */
+  .btn-dark-light {
+    background: var(--text-dark);
+    color: var(--white);
+    border-color: var(--text-dark);
+  }
+  .btn-dark-light::before { background: var(--white); }
+  .btn-dark-light:hover {
+    color: var(--text-dark);
+    border-color: var(--text-dark);
+  }
+
+  /* Floating mission card — Farmora style */
+  .hero-float-card {
+    position: absolute;
+    right: 5%; bottom: 110px;
+    z-index: 4;
+    background: rgba(10, 20, 8, 0.72);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(194, 221, 98, 0.22);
+    border-radius: 16px;
+    padding: 24px 28px;
+    max-width: 268px;
+    opacity: 0;
+  }
+  .hero-float-card-eyebrow {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 12px;
+  }
+  .hero-float-card-dot {
+    width: 8px; height: 8px; flex-shrink: 0;
+    background: var(--lime); border-radius: 50%;
+    box-shadow: 0 0 8px var(--lime-glow);
+  }
+  .hero-float-card-eyebrow span {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; font-size: 14px; color: var(--text);
+    letter-spacing: -0.3px;
+  }
+  .hero-float-card p {
+    color: rgba(255,255,255,0.65); font-size: 13px;
+    line-height: 1.65; margin-bottom: 16px;
+  }
+  .hero-float-card-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    color: var(--lime); text-decoration: none;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600; font-size: 12px; letter-spacing: 0.3px;
+    transition: gap 0.2s;
+  }
+  .hero-float-card-link:hover { gap: 10px; }
+
+  /* ============================================
+     SITE INTRO OVERLAY
+  ============================================ */
+  #site-intro {
+    position: fixed;
+    inset: 0;
+    z-index: 8000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  #intro-bg {
+    position: absolute;
+    inset: 0;
+    background: var(--bg);
+    z-index: 0;
+  }
+  #intro-logo-wrap {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    text-align: center;
+  }
+  #intro-mark {
+    width: 96px;
+    height: 96px;
+    background: var(--lime);
+    border-radius: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--bg);
+    transform: scale(0) rotate(-12deg);
+    box-shadow: 0 0 0 0 rgba(194,221,98,0);
+    position: relative;
+    overflow: hidden;
+  }
+  #intro-mark::after {
+    content: '';
+    position: absolute;
+    inset: -50%;
+    background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.35) 50%, transparent 60%);
+    transform: translateX(-100%) translateY(-100%);
+  }
+  #intro-mark.shimmer::after {
+    animation: introShimmer 0.6s ease forwards;
+  }
+  @keyframes introShimmer {
+    0% { transform: translateX(-100%) translateY(-100%); }
+    100% { transform: translateX(100%) translateY(100%); }
+  }
+  #intro-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(52px, 8vw, 96px);
+    font-weight: 700;
+    letter-spacing: -3px;
+    color: var(--white);
+    opacity: 0;
+    transform: translateY(28px);
+    line-height: 1;
+  }
+  #intro-tagline {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3.5px;
+    color: var(--lime);
+    text-transform: uppercase;
+    opacity: 0;
+    margin-top: -8px;
+  }
+  #intro-line {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    width: 0%;
+    z-index: 1;
+    background: var(--lime);
+    box-shadow: 0 0 18px var(--lime-glow);
+  }
+
+  /* MARQUEE */
+  .marquee { background: var(--lime); color: var(--bg); padding: 18px 0; overflow: hidden; position: relative; z-index: 2; }
+  .marquee-track { display: flex; gap: 40px; white-space: nowrap; animation: marqueeMove 30s linear infinite; }
+  .marquee-item { display: flex; align-items: center; gap: 40px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: clamp(16px, 1.6vw, 22px); letter-spacing: -0.4px; }
+  .marquee-item::after { content: ''; display: inline-block; width: 6px; height: 6px; background: var(--bg); border-radius: 50%; flex-shrink: 0; }
+  @keyframes marqueeMove { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+  /* SECTIONS */
+  section { padding: 100px 5%; position: relative; }
+  .container { max-width: 1300px; margin: 0 auto; }
+  .section-tag { display: inline-flex; align-items: center; gap: 10px; font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 2.5px; margin-bottom: 24px; }
+  .section-tag::before { content: ''; width: 20px; height: 1px; background: currentColor; }
+  .section-tag-dark { color: var(--lime); }
+  .section-tag-light { color: var(--text-dark); }
+  .section-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: clamp(32px, 4.5vw, 64px); line-height: 1; letter-spacing: -2px; }
+  .section-title .line { display: block; overflow: hidden; padding: 2px 0; }
+  .section-title .line > span { display: inline-block; transform: translateY(110%); }
+  .section-title .lime { color: var(--lime); }
+
+  /* INTRO LIGHT */
+  .intro { background: var(--white); color: var(--text-dark); padding: 120px 5%; }
+  .intro-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+  .intro-content { max-width: 520px; }
+  .intro-content .section-title { color: var(--text-dark); margin-bottom: 32px; }
+  .intro-content p { color: var(--text-dark-dim); font-size: 16px; margin-bottom: 16px; line-height: 1.7; }
+  .intro-list { margin-top: 36px; border-top: 1px solid var(--border-light); }
+  .intro-list li { list-style: none; padding: 18px 0; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-dark); }
+  .intro-list li span:last-child { color: var(--text-dark-dim); text-transform: none; letter-spacing: 0.3px; font-family: 'Inter Tight', sans-serif; font-size: 13px; }
+  .intro-image { position: relative; aspect-ratio: 4/5; overflow: hidden; border-radius: 10px; }
+  .intro-image img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.1); }
+  .intro-image .mask { position: absolute; inset: 0; background: var(--lime); transform-origin: bottom; z-index: 1; }
+  .intro-image .badge { position: absolute; bottom: 20px; left: 20px; background: var(--white); color: var(--text-dark); padding: 11px 18px; font-weight: 600; font-size: 11px; letter-spacing: 0.8px; text-transform: uppercase; border-radius: 100px; z-index: 2; display: flex; align-items: center; gap: 8px; }
+  .intro-image .badge::before { content: ''; width: 7px; height: 7px; background: var(--lime); border-radius: 50%; box-shadow: 0 0 6px var(--lime); }
+
+  /* ============================================
+     SERVICES - PER CARD MICRO ANIMATIONS
+  ============================================ */
+  .services { background: var(--bg); padding: 120px 5%; }
+  .services-header { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin-bottom: 64px; align-items: end; }
+  .services-header p { color: var(--text-dim); font-size: 15px; max-width: 360px; padding-bottom: 8px; line-height: 1.7; }
+  .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; align-items: start; }
+  .service-price { display: inline-block; margin-top: 12px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--lime); letter-spacing: 0.5px; }
+
+  .service-card {
+    background: var(--bg-2);
+    border-radius: 14px;
+    transition: all 0.4s;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    display: flex; flex-direction: column;
+  }
+  .service-card:hover { border-color: var(--lime); transform: translateY(-4px); }
+
+  /* ⚡ ANIMATION 3: Lime sweep line at top of card on hover */
+  .service-card::before {
+    content: ''; position: absolute;
+    top: 0; left: -100%; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--lime), transparent);
+    transition: left 0.6s ease;
+    z-index: 4;
+  }
+  .service-card:hover::before { left: 100%; }
+
+  .service-image { aspect-ratio: 16/10; overflow: hidden; position: relative; }
+  .service-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s, filter 0.4s; filter: brightness(0.85); }
+  .service-card:hover .service-image img { transform: scale(1.06); filter: brightness(1); }
+  .service-image::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 60%, rgba(13,13,13,0.9)); }
+  .service-tag { position: absolute; top: 14px; left: 14px; background: rgba(5,5,5,0.7); backdrop-filter: blur(8px); color: var(--lime); padding: 5px 12px; border-radius: 100px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; z-index: 2; border: 1px solid var(--lime-soft); }
+
+  .service-body { padding: 24px 24px 28px; display: flex; flex-direction: column; flex: 1; }
+  .service-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px; }
+  .service-num { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-dim); letter-spacing: 1.5px; }
+  .service-arrow { color: var(--lime); transition: transform 0.4s cubic-bezier(0.65, 0, 0.35, 1); font-size: 16px; display: inline-block; }
+  .service-card:hover .service-arrow { transform: translate(6px, -6px); }
+
+  .service-card h3 { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 18px; margin-bottom: 8px; letter-spacing: -0.5px; line-height: 1.2; }
+  .service-card p { color: var(--text-dim); font-size: 13.5px; line-height: 1.55; }
+
+  /* ⚡ ANIMATION 4: Service tag pulse on card hover */
+  .service-card:hover .service-tag {
+    animation: tagPulse 0.6s ease;
+  }
+  @keyframes tagPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.08); box-shadow: 0 0 16px var(--lime-glow); }
+    100% { transform: scale(1); }
+  }
+
+  /* ============================================
+     BEFORE/AFTER - AUTO-ANIMATED
+  ============================================ */
+  .before-after-section { background: var(--bg); padding: 120px 5%; border-top: 1px solid var(--border); }
+  .ba-header { margin-bottom: 64px; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: end; }
+  .ba-header p { color: var(--text-dim); font-size: 15px; max-width: 380px; padding-bottom: 8px; line-height: 1.7; }
+  .ba-cases { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+  /* Project switcher — desktop hidden, mobile visible */
+  .ba-switcher { display: none; }
+  .ba-tab { flex: 1; padding: 10px 18px; border: 1px solid var(--border); border-radius: 999px; background: transparent; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; cursor: pointer; transition: all 0.2s; }
+  .ba-tab.active { background: var(--lime); color: var(--bg); border-color: var(--lime); }
+
+  .ba-case { background: var(--bg-2); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; transition: border-color 0.3s; }
+  .ba-case:hover { border-color: var(--lime); }
+
+  .ba-slider-wrapper {
+    position: relative; aspect-ratio: 16/10;
+    overflow: hidden; cursor: ew-resize;
+    user-select: none;
+    background: var(--bg-3);
+  }
+  .ba-img { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .ba-img img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+  .ba-img.after { clip-path: inset(0 0 0 50%); }
+  /* Smooth auto animation - longer duration so it feels natural */
+  .ba-slider-wrapper:not(.dragging) .ba-img.after { transition: clip-path 0.1s linear; }
+
+  .ba-handle {
+    position: absolute; top: 0; bottom: 0;
+    left: 50%; width: 3px;
+    background: var(--lime);
+    transform: translateX(-50%);
+    pointer-events: none; z-index: 3;
+    box-shadow: 0 0 16px var(--lime-glow);
+  }
+  .ba-slider-wrapper:not(.dragging) .ba-handle { transition: left 0.1s linear; }
+
+  .ba-handle::before {
+    content: ''; position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 44px; height: 44px;
+    background: var(--lime); border-radius: 50%;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  }
+  .ba-handle::after {
+    content: '⇄'; position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--bg); font-size: 20px; font-weight: 700;
+  }
+
+  /* ⚡ ANIMATION 5: BA handle pulse ring */
+  .ba-handle .pulse-ring {
+    position: absolute; top: 50%; left: 50%;
+    width: 44px; height: 44px;
+    border: 2px solid var(--lime);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: ringPulse 2s infinite;
+  }
+  @keyframes ringPulse {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+  }
+
+  /* "Drag me" hint that fades after first interaction */
+  .ba-hint {
+    position: absolute;
+    bottom: 16px; left: 50%;
+    transform: translateX(-50%);
+    background: rgba(5,5,5,0.7);
+    backdrop-filter: blur(8px);
+    color: var(--lime);
+    padding: 6px 14px;
+    border-radius: 100px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    z-index: 4;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s;
+    border: 1px solid var(--lime-soft);
+  }
+  .ba-slider-wrapper:hover .ba-hint { opacity: 1; }
+
+  .ba-label { position: absolute; top: 16px; padding: 6px 14px; border-radius: 100px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600; z-index: 2; backdrop-filter: blur(8px); }
+  .ba-label.before { left: 16px; background: rgba(5,5,5,0.7); color: var(--white); border: 1px solid rgba(255,255,255,0.2); }
+  .ba-label.after { right: 16px; background: var(--lime); color: var(--bg); }
+  .ba-info { padding: 24px; }
+  .ba-info h3 { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 18px; margin-bottom: 8px; letter-spacing: -0.5px; }
+  .ba-info p { color: var(--text-dim); font-size: 13.5px; line-height: 1.6; margin-bottom: 16px; }
+  .ba-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .ba-tag { background: var(--bg-3); color: var(--text-dim); padding: 4px 12px; border-radius: 100px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; border: 1px solid var(--border); }
+
+  /* ============================================
+     PROCESS - ANIMATED LINE BETWEEN STEPS
+  ============================================ */
+  .process { background: var(--white); color: var(--text-dark); padding: 120px 5%; }
+  .process-header { margin-bottom: 64px; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: end; }
+  .process-header .section-title { color: var(--text-dark); }
+  .process-header p { color: var(--text-dark-dim); font-size: 15px; max-width: 420px; line-height: 1.7; }
+
+  .process-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 24px; position: relative;
+  }
+
+  /* ⚡ ANIMATION 6: Process line that draws on scroll */
+  .process-line-bg {
+    position: absolute;
+    top: 30px;
+    left: 12.5%; right: 12.5%;
+    height: 1px;
+    background: repeating-linear-gradient(to right, var(--text-dark-dim) 0 4px, transparent 4px 8px);
+    opacity: 0.3;
+    z-index: 0;
+  }
+  .process-line-progress {
+    position: absolute;
+    top: 30px;
+    left: 12.5%;
+    height: 2px;
+    background: var(--text-dark);
+    width: 0%;
+    z-index: 1;
+    transition: width 0.6s ease;
+  }
+  .process-line-progress::after {
+    content: '';
+    position: absolute;
+    right: -4px; top: -3px;
+    width: 8px; height: 8px;
+    background: var(--lime);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--lime);
+  }
+
+  .process-step { position: relative; z-index: 2; display: flex; flex-direction: column; }
+  .step-image {
+    position: relative;
+    aspect-ratio: 4/3;
+    overflow: hidden;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    background: var(--bg-3);
+  }
+  .step-image img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s;
+    filter: grayscale(0.2);
+  }
+  .process-step:hover .step-image img {
+    transform: scale(1.05);
+    filter: grayscale(0);
+  }
+  .step-image-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.4));
+    z-index: 1;
+  }
+  .step-number {
+    width: 60px; height: 60px; border-radius: 50%;
+    background: var(--white); border: 1.5px solid var(--text-dark);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+    font-size: 22px; color: var(--text-dark);
+    margin-bottom: 24px; transition: all 0.3s;
+    letter-spacing: -0.5px;
+    position: relative;
+  }
+  .process-step:hover .step-number { background: var(--lime); border-color: var(--lime); }
+
+  /* ⚡ ANIMATION 7: Step number pulse on activation */
+  .step-number.active {
+    background: var(--lime);
+    border-color: var(--lime);
+  }
+  .step-number.active::before {
+    content: '';
+    position: absolute; inset: -8px;
+    border: 1.5px solid var(--lime);
+    border-radius: 50%;
+    animation: stepRing 1.5s ease-out;
+  }
+  @keyframes stepRing {
+    0% { transform: scale(0.8); opacity: 1; }
+    100% { transform: scale(1.5); opacity: 0; }
+  }
+
+  .step-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 17px; letter-spacing: -0.4px; line-height: 1.2; margin-bottom: 10px; color: var(--text-dark); }
+  .step-desc { color: var(--text-dark-dim); font-size: 13.5px; line-height: 1.6; }
+
+  /* BANNER */
+  .banner { height: 60vh; min-height: 400px; position: relative; overflow: hidden; padding: 0; }
+  .banner img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(0.3) contrast(1.05); }
+  .banner-overlay { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(5,5,5,0.7) 0%, transparent 50%); z-index: 1; }
+  .banner-content { position: absolute; bottom: 60px; left: 5%; right: 5%; z-index: 2; color: var(--white); display: flex; justify-content: space-between; align-items: end; gap: 32px; flex-wrap: wrap; }
+  .banner-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: clamp(32px, 4.5vw, 64px); line-height: 1; letter-spacing: -1.5px; max-width: 700px; }
+  .banner-title .lime { color: var(--lime); }
+  .banner-meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--lime); letter-spacing: 2.5px; text-transform: uppercase; text-align: right; }
+  .banner-meta span { display: block; margin-bottom: 6px; }
+
+  /* ============================================
+     REVIEWS - INFINITE MARQUEE
+  ============================================ */
+  .reviews-section {
+    background: var(--bg);
+    padding: 120px 0 80px;
+    border-top: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .reviews-header {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 48px; margin: 0 5% 56px; align-items: end;
+    max-width: 1300px;
+  }
+  @media (min-width: 1300px) {
+    .reviews-header { margin: 0 auto 56px; }
+  }
+  .google-summary {
+    text-align: right; padding-bottom: 8px;
+  }
+  .google-summary-rating {
+    display: flex; align-items: center; gap: 12px;
+    justify-content: flex-end; margin-bottom: 8px;
+  }
+  .google-summary-stars { color: var(--lime); font-size: 18px; }
+  .google-summary-score {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+    font-size: 24px; letter-spacing: -0.5px;
+  }
+  .google-summary-count {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-dim); letter-spacing: 1px;
+    text-decoration: none;
+    transition: color 0.2s;
+    display: inline-block;
+  }
+  a.google-summary-count:hover {
+    color: var(--lime);
+  }
+
+  /* MARQUEE-STYLE REVIEW SLIDER */
+  .reviews-marquee {
+    position: relative;
+    overflow: hidden;
+    padding: 20px 0;
+  }
+  /* Edge fade gradient */
+  .reviews-marquee::before,
+  .reviews-marquee::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 120px;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .reviews-marquee::before {
+    left: 0;
+    background: linear-gradient(to right, var(--bg), transparent);
+  }
+  .reviews-marquee::after {
+    right: 0;
+    background: linear-gradient(to left, var(--bg), transparent);
+  }
+
+  .reviews-track {
+    display: flex;
+    gap: 20px;
+    animation: reviewsScroll 40s linear infinite;
+    width: max-content;
+  }
+  .reviews-track.paused { animation-play-state: paused; }
+
+  @keyframes reviewsScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(calc(-50% - 10px)); }
+  }
+
+  .review-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    transition: all 0.3s;
+    display: flex; flex-direction: column;
+    width: 360px;
+    flex-shrink: 0;
+  }
+  .review-card:hover {
+    border-color: var(--lime);
+    transform: translateY(-3px);
+    background: var(--bg-3);
+  }
+  /* Photo card variant - shows project image between reviews */
+  .review-photo-card {
+    width: 280px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid var(--border);
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .review-photo-card:hover {
+    border-color: var(--lime);
+    transform: translateY(-3px);
+  }
+  .review-photo-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    aspect-ratio: 1;
+    transition: transform 0.6s;
+  }
+  .review-photo-card:hover img {
+    transform: scale(1.05);
+  }
+  .review-photo-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.85));
+  }
+  .review-photo-label {
+    position: absolute;
+    bottom: 16px; left: 16px; right: 16px;
+    color: var(--white);
+    z-index: 2;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: -0.3px;
+    line-height: 1.3;
+  }
+  .review-photo-tag {
+    display: inline-block;
+    background: var(--lime);
+    color: var(--bg);
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    font-weight: 700;
+  }
+  .review-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .review-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--bg-3);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Grotesk', sans-serif; font-weight: 600;
+    font-size: 15px; color: var(--lime);
+    flex-shrink: 0; overflow: hidden;
+  }
+  .review-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+  .review-author { flex: 1; min-width: 0; }
+  .review-name {
+    font-family: 'Inter Tight', sans-serif; font-weight: 600;
+    font-size: 14px; color: var(--text); margin-bottom: 2px;
+  }
+  .review-meta {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; color: var(--text-dim);
+  }
+  .review-stars-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 10px;
+  }
+  .review-stars {
+    color: var(--lime); font-size: 13px;
+    letter-spacing: 1px;
+    display: inline-flex; gap: 2px;
+  }
+  /* ⚡ ANIMATION 8: Stars animate one by one when card hovered */
+  .review-stars .star {
+    display: inline-block;
+    transition: transform 0.3s, color 0.3s;
+  }
+  .review-card:hover .review-stars .star {
+    animation: starPop 0.5s ease forwards;
+  }
+  .review-card:hover .review-stars .star:nth-child(1) { animation-delay: 0s; }
+  .review-card:hover .review-stars .star:nth-child(2) { animation-delay: 0.08s; }
+  .review-card:hover .review-stars .star:nth-child(3) { animation-delay: 0.16s; }
+  .review-card:hover .review-stars .star:nth-child(4) { animation-delay: 0.24s; }
+  .review-card:hover .review-stars .star:nth-child(5) { animation-delay: 0.32s; }
+  @keyframes starPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.4); filter: drop-shadow(0 0 6px var(--lime)); }
+    100% { transform: scale(1); }
+  }
+
+  .review-date { font-size: 11px; color: var(--text-dim); }
+  .review-text {
+    color: rgba(255,255,255,0.85); font-size: 13.5px;
+    line-height: 1.6; margin-bottom: 14px; flex: 1;
+  }
+  .review-google {
+    display: flex; align-items: center; gap: 6px;
+    padding-top: 12px; border-top: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace; font-size: 9px;
+    color: var(--text-dim); letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* FAQ LIGHT */
+  .faq-section { background: var(--white); color: var(--text-dark); padding: 120px 5%; }
+  .faq-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 80px; align-items: start; }
+  .faq-grid .section-title { color: var(--text-dark); }
+  .faq-grid > div:first-child p { color: var(--text-dark-dim); font-size: 15px; margin-top: 20px; max-width: 300px; line-height: 1.7; }
+  .faq-image {
+    position: relative;
+    aspect-ratio: 4/5;
+    overflow: hidden;
+    border-radius: 12px;
+    margin-top: 40px;
+    max-width: 360px;
+  }
+  .faq-image img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s;
+  }
+  .faq-image:hover img { transform: scale(1.05); }
+  .faq-image-badge {
+    position: absolute;
+    bottom: 20px; left: 20px;
+    background: var(--lime);
+    color: var(--bg);
+    padding: 10px 18px;
+    border-radius: 100px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .faq-image-badge::before {
+    content: '';
+    width: 7px; height: 7px;
+    background: var(--bg);
+    border-radius: 50%;
+  }
+  .faq-list { border-top: 1px solid var(--border-light); }
+  .faq-item { border-bottom: 1px solid var(--border-light); padding: 24px 0; transition: padding 0.3s; position: relative; }
+
+  /* ⚡ ANIMATION 9: FAQ accent line slides in on open */
+  .faq-item::before {
+    content: '';
+    position: absolute;
+    left: -16px;
+    top: 50%; transform: translateY(-50%);
+    width: 8px; height: 8px;
+    background: var(--lime);
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.3s, left 0.3s;
+  }
+  .faq-item[open]::before {
+    opacity: 1;
+    left: -12px;
+    box-shadow: 0 0 12px var(--lime);
+  }
+  .faq-item:hover { padding-left: 6px; }
+  .faq-item summary { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: clamp(16px, 1.6vw, 20px); letter-spacing: -0.5px; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 20px; color: var(--text-dark); transition: color 0.3s; }
+  .faq-item summary:hover { color: var(--text-dark-dim); }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::after { content: '+'; color: var(--text-dark); font-size: 22px; font-weight: 300; transition: transform 0.4s cubic-bezier(0.65, 0, 0.35, 1); line-height: 1; background: var(--lime); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .faq-item[open] summary::after { transform: rotate(45deg); }
+  .faq-item p { color: var(--text-dark-dim); margin-top: 16px; font-size: 14px; max-width: 600px; line-height: 1.7; padding-bottom: 4px; }
+  .faq-body { overflow: hidden; max-height: 0; transition: max-height 0.34s cubic-bezier(0.4, 0, 0.2, 1); }
+
+  /* FAQ post-CTA */
+  .faq-cta {
+    margin-top: 32px;
+    padding: 24px;
+    background: var(--text-dark);
+    color: var(--white);
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .faq-cta > span {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: -0.3px;
+  }
+  .faq-cta-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .faq-cta-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 100px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+  }
+  .faq-cta-tel {
+    background: var(--lime);
+    color: var(--text-dark);
+  }
+  .faq-cta-tel:hover {
+    background: var(--white);
+  }
+  .faq-cta-wa {
+    background: #25D366;
+    color: #fff;
+  }
+  .faq-cta-wa:hover {
+    background: #1ea952;
+  }
+
+  /* MAP */
+  .map-section { background: var(--bg); padding: 0; border-top: 1px solid var(--border); position: relative; }
+  .map-grid { display: grid; grid-template-columns: 1fr 1.5fr; min-height: 600px; }
+  .map-content { padding: 80px 48px; display: flex; flex-direction: column; justify-content: center; border-right: 1px solid var(--border); }
+  .map-content .section-title { font-size: clamp(28px, 3.5vw, 48px); }
+  .map-content p { color: var(--text-dim); font-size: 15px; margin-bottom: 32px; max-width: 360px; line-height: 1.7; }
+  .areas { display: flex; flex-wrap: wrap; gap: 6px; }
+  .area-chip {
+    padding: 8px 14px; border: 1px solid var(--border);
+    border-radius: 100px; font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; color: var(--text-dim); letter-spacing: 0.8px;
+    text-transform: uppercase; transition: all 0.3s;
+    cursor: pointer; background: transparent; position: relative; overflow: hidden;
+  }
+  .area-chip:hover { border-color: var(--lime); color: var(--lime); background: var(--lime-soft); }
+  .area-chip.active { background: var(--lime); border-color: var(--lime); color: var(--bg); }
+  .areas-toggle { display: none; }
+
+  /* ⚡ ANIMATION 10: Chip activation ripple */
+  .area-chip.active::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: rgba(255,255,255,0.3);
+    border-radius: 100px;
+    animation: chipRipple 0.6s ease-out;
+  }
+  @keyframes chipRipple {
+    0% { transform: scale(0.5); opacity: 1; }
+    100% { transform: scale(1.5); opacity: 0; }
+  }
+
+  .map-wrapper { position: relative; overflow: hidden; }
+  #map {
+    width: 100%; height: 100%; min-height: 600px;
+    background: var(--bg-2);
+  }
+  /* Filter ALLEEN op de tile pane, markers blijven origineel */
+  #map .leaflet-tile-pane {
+    filter: invert(1) hue-rotate(180deg) brightness(0.95) saturate(0.6);
+  }
+  .map-overlay { position: absolute; top: 24px; left: 24px; background: var(--bg); border: 1px solid var(--lime); padding: 14px 18px; border-radius: 10px; z-index: 1000; pointer-events: none; }
+  .map-overlay-title { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--lime); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; }
+  .map-overlay-city { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 17px; color: var(--text); letter-spacing: -0.5px; }
+  /* ============================================
+     MAP MARKERS - REAL PINS
+  ============================================ */
+  /* Normal area dot marker */
+  .marker-pulse {
+    width: 14px; height: 14px; background: var(--lime);
+    border-radius: 50%; border: 2px solid var(--bg);
+    box-shadow: 0 0 0 0 var(--lime-glow);
+    animation: markerPulse 1.5s infinite;
+    cursor: pointer;
+    transition: transform 0.3s;
+  }
+  .marker-pulse.active {
+    width: 20px; height: 20px;
+    box-shadow: 0 0 20px var(--lime), 0 0 40px var(--lime-glow);
+    transform: scale(1.1);
+  }
+
+  /* HQ Pin - drops from above, distinctive style */
+  .marker-hq {
+    position: relative;
+    width: 40px; height: 50px;
+    cursor: pointer;
+    transform-origin: bottom center;
+    animation: hqDrop 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+    animation-delay: 0.3s;
+  }
+  @keyframes hqDrop {
+    0% { transform: translateY(-100px) scale(0.5); opacity: 0; }
+    60% { opacity: 1; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+  }
+  .marker-hq-pin {
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 36px; height: 36px;
+    background: var(--lime);
+    border-radius: 50% 50% 50% 0;
+    transform: translateX(-50%) rotate(-45deg);
+    box-shadow:
+      0 4px 12px rgba(0,0,0,0.4),
+      0 0 0 4px rgba(212,255,38,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .marker-hq-pin::after {
+    content: '';
+    width: 14px; height: 14px;
+    background: var(--bg);
+    border-radius: 50%;
+    transform: rotate(45deg);
+  }
+  /* Lightning icon inside HQ pin */
+  .marker-hq-icon {
+    position: absolute;
+    top: 11px; left: 50%;
+    transform: translateX(-50%);
+    width: 14px; height: 14px;
+    color: var(--lime);
+    z-index: 2;
+  }
+  /* Pulse ring around HQ */
+  .marker-hq-ring {
+    position: absolute;
+    top: -8px; left: 50%;
+    transform: translateX(-50%);
+    width: 52px; height: 52px;
+    border: 2px solid var(--lime);
+    border-radius: 50%;
+    opacity: 0;
+    animation: hqRing 2s ease-out infinite;
+    animation-delay: 1s;
+  }
+  @keyframes hqRing {
+    0% { transform: translateX(-50%) scale(0.6); opacity: 1; }
+    100% { transform: translateX(-50%) scale(1.8); opacity: 0; }
+  }
+  /* Tooltip showing on hover */
+  .marker-hq-label {
+    position: absolute;
+    bottom: -8px; left: 50%;
+    transform: translateX(-50%) translateY(100%);
+    background: var(--lime);
+    color: var(--bg);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    opacity: 0;
+    transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none;
+  }
+  .marker-hq-label::before {
+    content: '';
+    position: absolute;
+    top: -4px; left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    width: 8px; height: 8px;
+    background: var(--lime);
+  }
+  .marker-hq:hover .marker-hq-label {
+    opacity: 1;
+    transform: translateX(-50%) translateY(120%);
+  }
+  .marker-hq:hover .marker-hq-pin {
+    box-shadow:
+      0 6px 20px rgba(0,0,0,0.5),
+      0 0 0 6px rgba(212,255,38,0.3);
+  }
+  @keyframes markerPulse { 0% { box-shadow: 0 0 0 0 var(--lime-glow); } 70% { box-shadow: 0 0 0 10px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+
+  /* ============================================
+     FINAL CTA - CONCENTRIC PULSE RINGS
+  ============================================ */
+  .final-cta { background: var(--lime); color: var(--bg); padding: 140px 5%; text-align: center; position: relative; overflow: hidden; }
+
+  /* Background photo with lime overlay */
+  .cta-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    opacity: 0.15;
+    mix-blend-mode: multiply;
+  }
+  .cta-bg img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    filter: grayscale(1) contrast(1.2);
+  }
+
+  /* ⚡ ANIMATION 11: Concentric pulsing rings */
+  .cta-rings { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+  .cta-ring {
+    position: absolute;
+    top: 50%; left: 50%;
+    border: 1px solid rgba(0,0,0,0.15);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: ctaRing 4s ease-out infinite;
+  }
+  .cta-ring:nth-child(1) { width: 300px; height: 300px; animation-delay: 0s; }
+  .cta-ring:nth-child(2) { width: 300px; height: 300px; animation-delay: 1s; }
+  .cta-ring:nth-child(3) { width: 300px; height: 300px; animation-delay: 2s; }
+  .cta-ring:nth-child(4) { width: 300px; height: 300px; animation-delay: 3s; }
+  @keyframes ctaRing {
+    0% { width: 200px; height: 200px; opacity: 1; }
+    100% { width: 1400px; height: 1400px; opacity: 0; }
+  }
+
+  .final-cta h2 { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: clamp(40px, 6.5vw, 100px); margin-bottom: 24px; line-height: 0.95; letter-spacing: -3px; position: relative; z-index: 1; color: var(--bg); }
+  .final-cta p { font-size: clamp(15px, 1.3vw, 18px); margin-bottom: 40px; color: rgba(0,0,0,0.7); position: relative; z-index: 1; max-width: 540px; margin-left: auto; margin-right: auto; line-height: 1.6; }
+  .btn-cta-final { position: relative; z-index: 1; padding: 22px 44px; font-size: 14px; }
+  .final-cta-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* FOOTER */
+  footer { background: var(--bg); padding: 100px 5% 36px; border-top: 1px solid var(--border); position: relative; z-index: 1; }
+  .footer-content { max-width: 1300px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; }
+  .footer-brand p { color: var(--text-dim); font-size: 13.5px; margin-top: 20px; max-width: 300px; line-height: 1.7; }
+  .footer-col h4 { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--lime); margin-bottom: 20px; }
+  .footer-col p, .footer-col a { color: var(--text-dim); text-decoration: none; font-size: 13px; display: block; margin-bottom: 8px; transition: color 0.2s; line-height: 1.6; }
+  .footer-col a:hover { color: var(--lime); }
+  .copyright { max-width: 1300px; margin: 64px auto 0; padding-top: 24px; border-top: 1px solid var(--border); color: var(--text-dim); font-size: 10px; text-align: center; font-family: 'JetBrains Mono', monospace; letter-spacing: 2px; }
+
+  /* ============================================
+     RESPONSIVE - TABLET (≤1024px)
+  ============================================ */
+  @media (max-width: 1024px) {
+    body { font-size: 14.5px; }
+
+    /* Layout grids → 1 col */
+    .intro-grid { grid-template-columns: 1fr; gap: 48px; }
+    .services-grid { grid-template-columns: repeat(2, 1fr); }
+    .ba-cases { grid-template-columns: 1fr; gap: 20px; }
+    .process-grid { grid-template-columns: repeat(2, 1fr); gap: 40px; row-gap: 56px; }
+    .process-line-bg, .process-line-progress { display: none; }
+    .map-grid { grid-template-columns: 1fr; }
+    .map-content { padding: 64px 32px; border-right: none; border-bottom: 1px solid var(--border); }
+    .faq-grid { grid-template-columns: 1fr; gap: 48px; }
+    .faq-image { max-width: 100%; margin-top: 24px; }
+    .footer-content { grid-template-columns: 1fr 1fr; }
+
+    /* Headers → stacked */
+    .services-header, .process-header, .reviews-header, .ba-header { grid-template-columns: 1fr; gap: 20px; }
+    .google-summary { text-align: left; }
+    .google-summary-rating { justify-content: flex-start; }
+
+    /* Cards smaller */
+    .review-card { width: 320px; }
+    .review-photo-card { width: 240px; }
+
+    /* Padding tighter */
+    section { padding: 80px 5%; }
+    .intro, .services, .process, .faq-section, .before-after-section, .reviews-section { padding: 80px 5%; }
+    .reviews-section { padding: 80px 0; }
+    .reviews-header { margin: 0 5% 40px; }
+  }
+
+  /* ============================================
+     RESPONSIVE - MOBILE (≤768px)
+  ============================================ */
+  @media (max-width: 768px) {
+    body { font-size: 14px; padding-bottom: 60px; }
+    html { scroll-behavior: smooth; }
+
+    /* Disable custom cursor on mobile */
+    .cursor-dot, .cursor-blob { display: none !important; }
+
+    /* Sticky bottom call button visible */
+    .mobile-call-bar { display: flex; }
+
+    /* Nav */
+    .nav { padding: 14px 16px; }
+    .nav.scrolled { padding: 10px 16px; }
+    .logo-mark { width: 32px; height: 32px; }
+    .logo-text { font-size: 16px; }
+    .logo-text span { font-size: 7px; }
+    .nav-cta { padding: 9px 14px; font-size: 11px; }
+    .nav-cta span { display: none; }
+    .nav-links { display: none; }
+
+    /* HERO */
+    section { padding: 60px 5%; }
+    .hero { min-height: 95vh; }
+    .hero-content { padding: 110px 5% 160px; }
+    .hero-corners { display: none; }
+    .hero-grid::before { background-size: 50px 50px; }
+    /* Op mobile: geen mouse follow glow (geen muis) */
+    .hero-grid::after { display: none; }
+    h1 { font-size: clamp(34px, 9vw, 56px); letter-spacing: -1.5px; margin-bottom: 24px; }
+    .hero-sub { font-size: 14px; margin-bottom: 32px; max-width: 100%; }
+    .hero-meta { font-size: 9px; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
+    .hero-meta-divider { display: none; }
+    .hero-float-card { display: none; }
+    /* Buttons: 2 only, full-width */
+    .cta-group { flex-direction: column; align-items: stretch; gap: 10px; width: 100%; }
+    .cta-group .btn-secondary { display: none; }
+    .btn { justify-content: center; padding: 14px 24px; font-size: 13px; }
+
+    /* Marquee slower on mobile */
+    .marquee { padding: 14px 0; }
+    .marquee-track { animation-duration: 25s; }
+    .marquee-item { font-size: 16px; gap: 28px; }
+    .marquee-item::after { width: 5px; height: 5px; }
+
+    /* Section titles smaller */
+    .section-title { font-size: clamp(28px, 8vw, 40px); letter-spacing: -1.2px; }
+    .section-tag { font-size: 9px; letter-spacing: 1.5px; margin-bottom: 16px; }
+    .section-tag::before { width: 14px; }
+
+    /* INTRO */
+    .intro-image { aspect-ratio: 4/4; }
+    .intro-content p { font-size: 14px; }
+    .intro-list li { font-size: 10px; padding: 14px 0; gap: 12px; }
+    .intro-list li span:last-child { font-size: 12px; text-align: right; }
+
+    /* SERVICES - 1 col on phone */
+    .services-grid { grid-template-columns: 1fr; gap: 14px; }
+    .service-card h3 { font-size: 17px; }
+
+    /* BEFORE/AFTER */
+    .ba-cases { grid-template-columns: 1fr; gap: 0; }
+    .ba-case { display: none; }
+    .ba-case.active { display: block; }
+    .ba-switcher { display: flex; gap: 8px; margin-bottom: 20px; }
+    .ba-slider-wrapper { aspect-ratio: 4/3; }
+    .ba-handle::before { width: 36px; height: 36px; }
+    .ba-handle::after { font-size: 16px; }
+    .ba-label { font-size: 9px; padding: 5px 10px; top: 12px; }
+    .ba-label.before { left: 12px; }
+    .ba-label.after { right: 12px; }
+    .ba-info { padding: 20px; }
+    .ba-info h3 { font-size: 16px; }
+    .ba-hint { font-size: 8px; padding: 5px 10px; bottom: 12px; }
+
+    /* PROCESS - 2 cols stacked vertically */
+    .process-grid { grid-template-columns: 1fr; gap: 32px; row-gap: 32px; }
+    .step-image { aspect-ratio: 16/10; margin-bottom: 16px; }
+    .step-number { width: 50px; height: 50px; font-size: 18px; margin-bottom: 16px; }
+    .step-title { font-size: 16px; }
+
+    /* BANNER */
+    .banner { height: 45vh; min-height: 320px; }
+    .banner-content { flex-direction: column; align-items: start; bottom: 32px; gap: 16px; }
+    .banner-title { font-size: clamp(26px, 7vw, 36px); }
+    .banner-meta { text-align: left; }
+
+    /* REVIEWS */
+    .reviews-section { padding: 60px 0; }
+    .reviews-header { margin: 0 5% 32px; }
+    .review-card { width: 280px; padding: 20px; }
+    .review-photo-card { width: 200px; }
+    .review-text { font-size: 13px; }
+    .review-name { font-size: 13px; }
+    .review-meta { font-size: 10px; }
+    .reviews-track { animation-duration: 50s; gap: 14px; }
+    .google-summary-score { font-size: 20px; }
+    .google-summary-count { font-size: 10px; }
+
+    /* FAQ */
+    .faq-item { padding: 20px 0; }
+    .faq-item summary { font-size: 15px; gap: 12px; }
+    .faq-item summary::after { width: 32px; height: 32px; font-size: 20px; }
+    .faq-item p { font-size: 13px; }
+    .faq-image { aspect-ratio: 4/3; }
+    .faq-image-badge { font-size: 9px; padding: 8px 14px; bottom: 14px; left: 14px; }
+
+    /* MAP */
+    .map-content { padding: 48px 24px; }
+    .map-content p { font-size: 14px; }
+    .area-chip { font-size: 9px; padding: 6px 11px; letter-spacing: 0.5px; }
+    .areas { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+    .areas.open { max-height: 300px; }
+    .areas-toggle {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 18px; border: 1px solid rgba(194, 221, 98, 0.3);
+      border-radius: 999px; background: transparent;
+      color: var(--lime); font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+      cursor: pointer; margin-bottom: 16px; transition: all 0.2s;
+    }
+    .areas-toggle[aria-expanded="true"] { background: rgba(194, 221, 98, 0.1); }
+    #map { min-height: 360px; }
+    .map-wrapper #map { min-height: 360px; }
+    .map-grid { min-height: auto; }
+    .map-overlay { padding: 10px 14px; top: 16px; left: 16px; }
+    .map-overlay-title { font-size: 8px; }
+    .map-overlay-city { font-size: 14px; }
+
+    /* FINAL CTA */
+    .final-cta { padding: 80px 5%; }
+    .final-cta h2 { font-size: clamp(36px, 10vw, 56px); margin-bottom: 18px; letter-spacing: -1.8px; }
+    .final-cta p { font-size: 14px; margin-bottom: 28px; }
+    .btn-cta-final { padding: 18px 32px; font-size: 13px; }
+    .cta-ring:nth-child(1), .cta-ring:nth-child(2), .cta-ring:nth-child(3), .cta-ring:nth-child(4) {
+      width: 200px; height: 200px;
+    }
+    @keyframes ctaRing {
+      0% { width: 100px; height: 100px; opacity: 1; }
+      100% { width: 800px; height: 800px; opacity: 0; }
+    }
+
+    /* FOOTER */
+    footer { padding: 60px 5% 32px; }
+    .footer-content { grid-template-columns: 1fr; gap: 32px; }
+    .footer-brand p { font-size: 13px; }
+    .copyright { margin-top: 40px; font-size: 9px; }
+
+    /* Disable parallax on banner (kan flickeren) */
+    .banner img { transform: none !important; }
+
+  }
+
+  /* ============================================
+     RESPONSIVE - SMALL PHONE (≤480px)
+  ============================================ */
+  @media (max-width: 480px) {
+    .hero-content { padding: 100px 5% 180px; }
+    h1 { font-size: clamp(30px, 9vw, 44px); }
+    .section-title { font-size: clamp(26px, 8.5vw, 36px); }
+    .service-image { aspect-ratio: 16/9; }
+    .review-card { width: 260px; }
+    .review-photo-card { width: 180px; }
+    .ba-handle::before { width: 32px; height: 32px; }
+    .ba-handle::after { font-size: 14px; }
+    .marquee-item { font-size: 14px; }
+    .areas { gap: 5px; }
+    .area-chip { padding: 5px 10px; font-size: 8.5px; }
+  }
+
+  /* ============================================
+     ANIMATIONS - REDUCED MOTION
+  ============================================ */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+    .reviews-track { animation: none !important; }
+    .marquee-track { animation: none !important; }
+  }
+
+  /* ============================================
+     PILL CLOUD (services tag styling)
+     ============================================ */
+  .pill-cloud {
+    background: var(--bg-2);
+    border-radius: 24px;
+    padding: 60px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    align-items: center;
+    margin: 60px 0;
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .pill-cloud::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(194, 221, 98, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(194, 221, 98, 0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+  .pill-cloud-row {
+    display: flex; gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    position: relative; z-index: 2;
+  }
+  .pc-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 22px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 500;
+    font-family: 'Inter Tight', sans-serif;
+    transition: transform 0.3s ease;
+    cursor: default;
+  }
+  .pc-pill:hover { transform: translateY(-3px); }
+  .pc-pill svg { width: 18px; height: 18px; }
+  .pc-lime { background: var(--lime); color: var(--bg); }
+  .pc-dark { background: var(--bg); color: var(--lime); border: 1px solid var(--border-strong); }
+  .pc-moss { background: var(--moss); color: var(--text); }
+  .pc-bright { background: var(--lime-bright); color: var(--bg); }
+
+  /* ============================================
+     LUVI AURORA BACKGROUND (FAQ)
+     ============================================ */
+  .luvi-bg-wrap {
+    position: relative;
+    overflow: hidden;
+  }
+  .luvi-grid-bg {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(194, 221, 98, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(194, 221, 98, 0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+  .luvi-aurora-1 {
+    position: absolute;
+    width: 800px; height: 600px;
+    bottom: -200px; left: -200px;
+    background: radial-gradient(ellipse, rgba(77, 255, 122, 0.15) 0%, transparent 60%);
+    filter: blur(60px);
+    pointer-events: none;
+  }
+  .luvi-aurora-2 {
+    position: absolute;
+    width: 600px; height: 500px;
+    top: -100px; right: -100px;
+    background: radial-gradient(ellipse, rgba(45, 212, 191, 0.12) 0%, transparent 60%);
+    filter: blur(50px);
+    pointer-events: none;
+  }
+
+  /* ============================================
+     EVERGREEN FLOATING ICON BADGE
+     ============================================ */
+  .evergreen-badge {
+    position: absolute;
+    width: 80px; height: 80px;
+    background: var(--lime);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 5;
+    color: var(--bg);
+  }
+  .evergreen-badge svg { width: 44px; height: 44px; }
+
+  /* ============================================
+     RESPONSIVE FIXES
+     ============================================ */
+  @media (max-width: 900px) {
+    .pill-cloud { padding: 40px 20px; }
+    .pc-pill { font-size: 13px; padding: 10px 16px; }
+  }
+
+/* ── Pill image preview ──────────────────────────────────────────── */
+.pill-img-preview {
+  position: fixed; z-index: 9990; pointer-events: none;
+  width: 220px; height: 150px; border-radius: 12px;
+  overflow: hidden; box-shadow: 0 12px 40px rgba(0,0,0,.5);
+  border: 1px solid var(--border-strong);
+  opacity: 0; transform: scale(0.92);
+  transition: opacity .2s ease, transform .2s ease;
+}
+.pill-img-preview.visible { opacity: 1; transform: scale(1); }
+.pill-img-preview img { width: 100%; height: 100%; object-fit: cover; }
+@media (hover: none) { .pill-img-preview { display: none; } }
+
+/* ── Chatbot Widget ──────────────────────────────────────────────── */
+#faq-btn {
+  position:fixed;bottom:24px;right:24px;z-index:9998;
+  width:56px;height:56px;border-radius:50%;
+  background:var(--lime);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 20px var(--lime-glow);
+  transition:transform .2s cubic-bezier(0.4,0,0.2,1),box-shadow .2s cubic-bezier(0.4,0,0.2,1);
+}
+#faq-btn:hover{transform:scale(1.08);box-shadow:0 6px 28px var(--lime-glow);}
+#faq-btn:focus-visible{outline:3px solid var(--lime);outline-offset:3px;}
+#faq-btn svg{width:24px;height:24px;}
+.faq-dot{
+  position:absolute;top:10px;right:10px;
+  width:10px;height:10px;border-radius:50%;
+  background:var(--lime-bright);border:2px solid var(--bg);
+  animation:faqPulse 2s ease-in-out infinite;
+}
+@keyframes faqPulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.25);opacity:.7;}}
+#faq-panel{
+  position:fixed;bottom:92px;right:24px;z-index:9997;
+  width:360px;max-height:520px;
+  background:var(--bg-2);border:1px solid var(--border);border-radius:1rem;
+  box-shadow:0 8px 48px rgba(0,0,0,.5),0 2px 8px rgba(0,0,0,.3);
+  display:flex;flex-direction:column;overflow:hidden;
+  opacity:0;transform:translateY(16px) scale(.97);
+  pointer-events:none;
+  transition:opacity .25s cubic-bezier(0.4,0,0.2,1),transform .25s cubic-bezier(0.4,0,0.2,1);
+}
+#faq-panel.open{opacity:1;transform:translateY(0) scale(1);pointer-events:auto;}
+.faq-header{
+  background:var(--bg-3);color:var(--text);
+  padding:1rem 1.125rem;display:flex;align-items:center;gap:.75rem;flex-shrink:0;
+  border-top:2px solid var(--lime);border-bottom:1px solid var(--border);
+}
+.faq-header-logo{
+  width:36px;height:36px;border-radius:.5rem;
+  background:var(--lime);display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;color:var(--bg);
+}
+.faq-header-title{flex:1;font-family:'Space Grotesk',sans-serif;}
+.faq-header-title strong{display:block;font-size:.9375rem;font-weight:700;color:var(--text);}
+.faq-header-title span{font-size:.75rem;color:var(--text-dim);display:flex;align-items:center;gap:.375rem;font-family:'JetBrains Mono',monospace;}
+.faq-online-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#22c55e;flex-shrink:0;box-shadow:0 0 0 2px rgba(34,197,94,.25);}
+.faq-close{
+  background:none;border:none;cursor:pointer;color:var(--text-dim);
+  padding:4px;border-radius:.375rem;display:flex;align-items:center;
+  transition:color .15s;
+}
+.faq-close:hover{color:var(--text);}
+.faq-close:focus-visible{outline:2px solid var(--lime);}
+.faq-messages{
+  flex:1;overflow-y:auto;padding:1rem;
+  display:flex;flex-direction:column;gap:.625rem;
+  scroll-behavior:smooth;background:var(--bg-2);
+}
+.faq-messages::-webkit-scrollbar{width:4px;}
+.faq-messages::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:2px;}
+.faq-bubble-row{display:flex;gap:.5rem;align-items:flex-end;}
+.faq-bubble-row.user{flex-direction:row-reverse;}
+.faq-avatar{
+  width:28px;height:28px;border-radius:50%;
+  background:var(--lime);display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;overflow:hidden;color:var(--bg);
+}
+.faq-avatar svg{width:18px;height:18px;display:block;}
+.faq-bubble{
+  max-width:80%;padding:.625rem .875rem;
+  border-radius:1rem;font-size:.875rem;line-height:1.5;font-family:'Inter Tight',sans-serif;
+}
+.faq-bubble-row.bot .faq-bubble{
+  background:var(--bg-3);color:var(--text);border:1px solid var(--border);border-bottom-left-radius:.25rem;
+}
+.faq-bubble-row.user .faq-bubble{
+  background:var(--lime);color:var(--bg);border-bottom-right-radius:.25rem;
+}
+.faq-typing{
+  display:flex;align-items:center;gap:4px;
+  padding:.5rem .875rem;background:var(--bg-3);
+  border:1px solid var(--border);
+  border-radius:1rem;border-bottom-left-radius:.25rem;width:fit-content;
+}
+.faq-typing span{
+  width:6px;height:6px;border-radius:50%;background:var(--text-dim);
+  animation:faqDot .9s ease-in-out infinite;
+}
+.faq-typing span:nth-child(2){animation-delay:.15s;}
+.faq-typing span:nth-child(3){animation-delay:.3s;}
+@keyframes faqDot{0%,60%,100%{transform:translateY(0);opacity:.4;}30%{transform:translateY(-4px);opacity:1;}}
+.faq-cta-btn{
+  display:block;margin-top:.625rem;
+  background:var(--lime);color:var(--bg);
+  border-radius:.5rem;padding:.5rem 1rem;
+  font-weight:700;font-size:.8125rem;
+  text-align:center;text-decoration:none;cursor:pointer;
+  transition:background .15s,transform .15s;
+}
+.faq-cta-btn:hover{background:var(--lime-bright);transform:translateY(-1px);}
+.faq-chips{display:flex;flex-direction:column;gap:.375rem;margin-top:.375rem;}
+.faq-chip{
+  background:transparent;border:1.5px solid var(--border);
+  border-radius:.625rem;padding:.4rem .75rem;
+  font-size:.8125rem;cursor:pointer;text-align:left;
+  color:var(--text-dim);transition:background .15s,border-color .15s,color .15s;
+  font-family:'JetBrains Mono',monospace;
+}
+.faq-chip:hover{background:var(--lime-soft);border-color:var(--lime);color:var(--lime);}
+.faq-chip:focus-visible{outline:2px solid var(--lime);outline-offset:2px;}
+#faq-shortcuts{display:flex;flex-wrap:wrap;gap:.375rem;padding:.5rem 1rem;border-top:1px solid var(--border);flex-shrink:0;background:var(--bg-3);}
+#faq-shortcuts .faq-chip{white-space:nowrap;padding:.3rem .65rem;font-size:.75rem;}
+.faq-inline-chips{display:flex;flex-wrap:wrap;gap:.375rem;margin-top:.5rem;}
+.faq-inline-chip{background:transparent;border:1.5px solid var(--border);border-radius:.5rem;padding:.3rem .6rem;font-size:.75rem;cursor:pointer;color:var(--text-dim);transition:background .15s,border-color .15s,color .15s;white-space:nowrap;}
+.faq-inline-chip:hover{background:var(--lime-soft);border-color:var(--lime);color:var(--lime);}
+.faq-input-row{
+  display:flex;gap:.5rem;padding:.75rem 1rem;
+  border-top:1px solid var(--border);flex-shrink:0;background:var(--bg-3);
+}
+#faq-input{
+  flex:1;border:1.5px solid var(--border);border-radius:.625rem;
+  padding:.5rem .75rem;font-size:.875rem;color:var(--text);
+  outline:none;transition:border-color .15s;background:var(--bg-2);
+  font-family:'Inter Tight',sans-serif;
+}
+#faq-input::placeholder{color:var(--text-dim);}
+#faq-input:focus{border-color:var(--lime);}
+#faq-send{
+  width:36px;height:36px;border-radius:.625rem;
+  background:var(--lime);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .15s,transform .15s;flex-shrink:0;
+}
+#faq-send:hover{background:var(--lime-bright);transform:scale(1.05);}
+#faq-send:focus-visible{outline:2px solid var(--lime);outline-offset:2px;}
+#faq-send svg{width:16px;height:16px;}
+@media(max-width:640px){
+  #faq-panel{
+    position:fixed;inset:0;width:100%;
+    height:100vh;height:100dvh;
+    max-height:none;border-radius:0;
+    opacity:1;transform:translateY(100%);
+    transition:transform .35s cubic-bezier(0.4,0,0.2,1);
+  }
+  #faq-panel.open{transform:translateY(0);opacity:1;}
+  #faq-btn{bottom:76px;right:16px;}
+  #faq-input{font-size:16px;}
+}
+
+</style>
+</head>
+<body>
+
+<!-- SITE INTRO OVERLAY -->
+<div id="site-intro" aria-hidden="true">
+  <div id="intro-bg"></div>
+  <div id="intro-logo-wrap">
+    <div id="intro-mark">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75C7 8 17 8 17 8z"/></svg>
+    </div>
+    <div id="intro-name">Verdant.</div>
+    <div id="intro-tagline">Tuinaanleg &amp; onderhoud · Brugge</div>
+  </div>
+  <div id="intro-line"></div>
+</div>
+
+<!-- Skip link voor screen readers en toetsenbord-gebruikers -->
+<a href="#main-content" class="skip-link">Naar hoofdinhoud</a>
+
+<noscript>
+  <div style="position:fixed;top:0;left:0;right:0;background:#C2DD62;color:#0a1408;padding:14px 20px;text-align:center;z-index:99999;font-family:system-ui,-apple-system,sans-serif;font-size:14px;font-weight:600;">
+    JavaScript is uitgeschakeld. Bel ons direct op
+    <a href="tel:+320000000000" style="color:#0a1408;text-decoration:underline;">[TODO: TELEFOONNUMMER]</a>
+    of stuur een
+    <a href="https://wa.me/32000000000" style="color:#0a1408;text-decoration:underline;">WhatsApp</a>.
+  </div>
+</noscript>
+
+<div class="cursor-blob" aria-hidden="true"></div>
+<div class="cursor-dot" aria-hidden="true"></div>
+
+<!-- Sticky mobile actie-bar: bel + WhatsApp -->
+<div class="mobile-call-bar" role="region" aria-label="Snelle contact-acties">
+  <a href="tel:+320000000000" class="mc-tel" aria-label="Bel ons op [TODO: TELEFOONNUMMER]">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57-.35-.11-.74-.03-1.02.24l-2.2 2.2c-2.83-1.44-5.15-3.75-6.59-6.59l2.2-2.21c.28-.26.36-.65.25-1C8.7 6.45 8.5 5.25 8.5 4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1z"/></svg>
+    Bellen
+  </a>
+  <a href="https://wa.me/32000000000?text=Hallo%20Verdant%2C%20ik%20heb%20een%20vraag." class="mc-wa" target="_blank" rel="noopener noreferrer" aria-label="Stuur WhatsApp">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.297-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    WhatsApp
+  </a>
+</div>
+
+<nav class="nav" id="nav">
+  <a href="#" class="logo" data-cursor="hover" aria-label="Verdant - terug naar home">
+    <div class="logo-mark">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75C7 8 17 8 17 8z"/></svg>
+    </div>
+    <div class="logo-text">Verdant<span>EST. 2010</span></div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#diensten">Diensten</a></li>
+    <li><a href="#realisaties">Realisaties</a></li>
+    <li><a href="#werkgebied">Werkgebied</a></li>
+    <li><a href="#faq">FAQ</a></li>
+  </ul>
+  <a href="tel:+320000000000" class="nav-cta" data-cursor="hover" aria-label="Bel ons op [TODO: TELEFOONNUMMER]">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57-.35-.11-.74-.03-1.02.24l-2.2 2.2c-2.83-1.44-5.15-3.75-6.59-6.59l2.2-2.21c.28-.26.36-.65.25-1C8.7 6.45 8.5 5.25 8.5 4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1z"/></svg>
+    <span>[TODO: TELEFOONNUMMER]</span>
+  </a>
+</nav>
+
+<main id="main-content">
+<header class="hero">
+  <div class="hero-video">
+    <video autoplay muted loop playsinline preload="auto" poster="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=2000&q=80">
+      <source src="https://videos.pexels.com/video-files/4488709/4488709-uhd_2560_1440_25fps.mp4" type="video/mp4">
+      <source src="https://videos.pexels.com/video-files/3015487/3015487-hd_1920_1080_24fps.mp4" type="video/mp4">
+      <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=2000&q=80" alt="Tuinier aan het werk">
+    </video>
+  </div>
+  <div class="hero-overlay"></div>
+  <div class="hero-grid" id="heroGrid" aria-hidden="true"></div>
+
+  <div class="hero-flash" id="heroFlash" aria-hidden="true"></div>
+
+  <!-- Blueprint corner brackets -->
+  <div class="hero-corners" aria-hidden="true">
+    <div class="hero-corner tl"></div>
+    <div class="hero-corner tr"></div>
+    <div class="hero-corner bl"></div>
+    <div class="hero-corner br"></div>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-meta">
+      <span class="dot"></span>
+      <span>Vandaag beschikbaar</span>
+      <span class="hero-meta-divider"></span>
+      <span>Brugge en West-Vlaanderen</span>
+    </div>
+
+    <h1>
+      <span class="word-line"><span class="word">De tuin</span></span>
+      <span class="word-line">
+        <span class="word">die </span>
+        <span class="word"><span class="lime">groeit.</span></span>
+      </span>
+    </h1>
+
+    <p class="hero-sub">
+      Van maaien en snoeien tot ontmossen en bladruimen. Jan doet het netjes — met vaste prijs en zonder gedoe.
+    </p>
+
+    <div class="cta-group">
+      <a href="tel:+320000000000" class="btn btn-primary magnetic" data-cursor="hover" aria-label="Bel ons nu op [TODO: TELEFOONNUMMER]">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57-.35-.11-.74-.03-1.02.24l-2.2 2.2c-2.83-1.44-5.15-3.75-6.59-6.59l2.2-2.21c.28-.26.36-.65.25-1C8.7 6.45 8.5 5.25 8.5 4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1z"/></svg>
+        <span>Bel direct</span>
+      </a>
+      <a href="https://wa.me/32000000000?text=Hallo%20Verdant%2C%20ik%20heb%20een%20vraag." class="btn btn-whatsapp magnetic" data-cursor="hover" target="_blank" rel="noopener noreferrer" aria-label="Stuur ons een WhatsApp bericht">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.297-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        <span>WhatsApp</span>
+      </a>
+      <a href="#diensten" class="btn btn-secondary magnetic" data-cursor="hover">
+        <span>Ons werk</span>
+        <span aria-hidden="true">↓</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="hero-float-card" id="heroFloatCard">
+    <div class="hero-float-card-eyebrow">
+      <div class="hero-float-card-dot"></div>
+      <span>Jan's belofte</span>
+    </div>
+    <p>Vaste prijs vóór het begin. Netjes afgewerkt. Altijd Jan die langskomt — geen onderaannemers.</p>
+    <a href="#diensten" class="hero-float-card-link">
+      Bekijk diensten
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+
+</header>
+
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    <div class="marquee-item">Tuinaanleg</div>
+    <div class="marquee-item">Onderhoud</div>
+    <div class="marquee-item">Snoeiwerk</div>
+    <div class="marquee-item">Beregening</div>
+    <div class="marquee-item">Tuinverlichting</div>
+    <div class="marquee-item">Ecologisch</div>
+    <div class="marquee-item">Tuinaanleg</div>
+    <div class="marquee-item">Onderhoud</div>
+    <div class="marquee-item">Snoeiwerk</div>
+    <div class="marquee-item">Beregening</div>
+    <div class="marquee-item">Tuinverlichting</div>
+    <div class="marquee-item">Ecologisch</div>
+  </div>
+</div>
+
+<section class="intro">
+  <div class="container">
+    <div class="intro-grid">
+      <div class="intro-image" style="position: relative;">
+        <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=900&q=80" alt="Verdant tuinier aan het werk">
+        <div class="mask"></div>
+        <div class="badge">Beschikbaar</div>
+        <div class="evergreen-badge" style="top: 50%; left: 50%; transform: translate(-50%, -50%);">
+          <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M30 50 Q30 35 50 35 Q70 35 70 50"/>
+            <path d="M50 35 L50 22"/>
+            <path d="M40 28 L36 18"/>
+            <path d="M60 28 L64 18"/>
+            <path d="M32 36 L24 30"/>
+            <path d="M68 36 L76 30"/>
+            <path d="M30 50 L70 50"/>
+            <circle cx="42" cy="50" r="2.5" fill="currentColor"/>
+            <circle cx="58" cy="50" r="2.5" fill="currentColor"/>
+            <path d="M40 60 Q50 68 60 60"/>
+          </svg>
+        </div>
+      </div>
+      <div class="intro-content">
+        <span class="section-tag section-tag-light">Over Verdant</span>
+        <h2 class="section-title">
+          <span class="line"><span>Vakkennis,</span></span>
+          <span class="line"><span>geen <span class="lime">praatjes.</span></span></span>
+        </h2>
+        <p>Jan is uw lokale tuinman — al meer dan 15 jaar bezig met één ding: uw tuin netjes, gezond en in topconditie houden.</p>
+        <p>U belt Jan, Jan komt langs. Geen onderaannemers, geen verrassingen.</p>
+
+        <ul class="intro-list">
+          <li><span>Erkenning</span><span>BIO-gecertificeerd · BTW geregistreerd</span></li>
+          <li><span>Verzekering</span><span>BA · Beroepsaansprakelijkheid</span></li>
+          <li><span>Actief sinds</span><span>2010 · Brugge en omgeving</span></li>
+          <li><span>Specialiteit</span><span>Particulier & KMO</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="services" id="diensten">
+  <div class="container">
+    <div class="services-header">
+      <div>
+        <span class="section-tag section-tag-dark">Diensten</span>
+        <h2 class="section-title">
+          <span class="line"><span>Alles wat</span></span>
+          <span class="line"><span>uw tuin <span class="lime">nodig heeft.</span></span></span>
+        </h2>
+      </div>
+      <p>Vaste tarieven, geen verrassingen achteraf. Jan geeft altijd een prijs vóór hij begint.</p>
+    </div>
+
+    <div class="services-grid">
+      <article class="service-card" data-cursor="hover">
+        <div class="service-image">
+          <span class="service-tag">Onderhoud</span>
+          <img src="assets/action-harking.png" alt="Gazononderhoud door Jan">
+        </div>
+        <div class="service-body">
+          <div class="service-header">
+            <div class="service-num">01</div>
+            <div class="service-arrow">↗</div>
+          </div>
+          <h3>Gazononderhoud</h3>
+          <p>Maaien, kanten steken en verzorging op maat. Regelmatig of éénmalig — Jan laat uw gazon er altijd verzorgd uitzien.</p>
+          <span class="service-price">Vanaf €35 / beurt</span>
+        </div>
+      </article>
+
+      <article class="service-card" data-cursor="hover">
+        <div class="service-image">
+          <span class="service-tag">Snoei</span>
+          <img src="assets/action-cutting-bush.png" alt="Heg- en struiksnoei">
+        </div>
+        <div class="service-body">
+          <div class="service-header">
+            <div class="service-num">02</div>
+            <div class="service-arrow">↗</div>
+          </div>
+          <h3>Heg- & struiksnoei</h3>
+          <p>Alle soorten hagen, buxussen en sierheesters. Strak bijgeknipt en nette opruiming inbegrepen.</p>
+          <span class="service-price">Vanaf €50</span>
+        </div>
+      </article>
+
+      <article class="service-card" data-cursor="hover">
+        <div class="service-image">
+          <span class="service-tag">Bomen</span>
+          <img src="assets/action-cutting.png" alt="Boomverzorging">
+        </div>
+        <div class="service-body">
+          <div class="service-header">
+            <div class="service-num">03</div>
+            <div class="service-arrow">↗</div>
+          </div>
+          <h3>Boomverzorging</h3>
+          <p>Snoeien, kronen optillen en kleine verwijderingen. Jan werkt veilig en voorzichtig. Afvoer snoeihout inbegrepen.</p>
+          <span class="service-price">Op offerte</span>
+        </div>
+      </article>
+
+      <article class="service-card" data-cursor="hover">
+        <div class="service-image">
+          <span class="service-tag">Ontmossen</span>
+          <img src="assets/moss.png" alt="Ontmossen oprit en terras">
+        </div>
+        <div class="service-body">
+          <div class="service-header">
+            <div class="service-num">04</div>
+            <div class="service-arrow">↗</div>
+          </div>
+          <h3>Ontmossen</h3>
+          <p>Oprit, terras, gazon of dak — Jan verwijdert mos grondig en milieuvriendelijk. Resultaat zichtbaar na één behandeling.</p>
+          <span class="service-price">Vanaf €40</span>
+        </div>
+      </article>
+
+      <article class="service-card" data-cursor="hover">
+        <div class="service-image">
+          <span class="service-tag">Seizoen</span>
+          <img src="assets/action-carrying-leaves.png" alt="Bladruimen en tuinopkuis">
+        </div>
+        <div class="service-body">
+          <div class="service-header">
+            <div class="service-num">05</div>
+            <div class="service-arrow">↗</div>
+          </div>
+          <h3>Tuinopkuis & bladruimen</h3>
+          <p>Herfst- en lentebeurt, bladruimen, onkruid wieden en alles netjes achterlaten. Éénmalig of als vast onderdeel.</p>
+          <span class="service-price">Vanaf €45</span>
+        </div>
+      </article>
+
+      <article class="service-card" data-cursor="hover">
+        <div class="service-image">
+          <span class="service-tag">Contract</span>
+          <img src="assets/testimonial-garden.png" alt="Seizoenscontract">
+        </div>
+        <div class="service-body">
+          <div class="service-header">
+            <div class="service-num">06</div>
+            <div class="service-arrow">↗</div>
+          </div>
+          <h3>Seizoenscontract</h3>
+          <p>Elke maand of elk seizoen uw tuin in topconditie. Vaste prijs, vaste tuinman — geen zorgen.</p>
+          <span class="service-price">Prijs op maat</span>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="before-after-section" id="realisaties">
+  <div class="container">
+    <div class="ba-header">
+      <div>
+        <span class="section-tag section-tag-dark">Voor & na</span>
+        <h2 class="section-title">
+          <span class="line"><span>Voor en</span></span>
+          <span class="line"><span>na, naast <span class="lime">elkaar.</span></span></span>
+        </h2>
+      </div>
+      <p>De sliders bewegen automatisch. Houd je muis erover om te pauzeren en zelf te slepen.</p>
+    </div>
+
+    <div class="ba-switcher" role="tablist" aria-label="Selecteer project">
+      <button class="ba-tab active" role="tab" aria-selected="true" data-case="0">Oprit Brugge</button>
+      <button class="ba-tab" role="tab" aria-selected="false" data-case="1">Ontmossen Assebroek</button>
+    </div>
+    <div class="ba-cases">
+      <div class="ba-case">
+        <div class="ba-slider-wrapper" data-ba data-auto>
+          <div class="ba-img before">
+            <img src="assets/before-porch.png" alt="Voor opkuis voortuin">
+          </div>
+          <div class="ba-img after">
+            <img src="assets/after-porch.png" alt="Na opkuis voortuin">
+          </div>
+          <span class="ba-label before">Voor</span>
+          <span class="ba-label after">Na</span>
+          <div class="ba-handle"><div class="pulse-ring"></div></div>
+          <div class="ba-hint">Sleep om te vergelijken</div>
+        </div>
+        <div class="ba-info">
+          <h3>Oprit & voortuin Brugge</h3>
+          <p>Verwaarloosde voortuin opgeruimd, onkruid verwijderd en oprit grondig gereinigd. Klaar in één dag.</p>
+          <div class="ba-tags">
+            <span class="ba-tag">Opkuis</span>
+            <span class="ba-tag">Onkruid</span>
+            <span class="ba-tag">1 dag</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ba-case">
+        <div class="ba-slider-wrapper" data-ba data-auto>
+          <div class="ba-img before">
+            <img src="assets/before-moss.png" alt="Voor ontmossen oprit">
+          </div>
+          <div class="ba-img after">
+            <img src="assets/after-moss.png" alt="Na ontmossen oprit">
+          </div>
+          <span class="ba-label before">Voor</span>
+          <span class="ba-label after">Na</span>
+          <div class="ba-handle"><div class="pulse-ring"></div></div>
+          <div class="ba-hint">Sleep om te vergelijken</div>
+        </div>
+        <div class="ba-info">
+          <h3>Ontmossen oprit Assebroek</h3>
+          <p>Volledige ontmossing van oprit en terras. Milieuvriendelijk middel, geen beschadiging aan tegels.</p>
+          <div class="ba-tags">
+            <span class="ba-tag">Ontmossen</span>
+            <span class="ba-tag">Terras</span>
+            <span class="ba-tag">½ dag</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="process">
+  <div class="container">
+    <div class="process-header">
+      <div>
+        <span class="section-tag section-tag-light">Jan's aanpak</span>
+        <h2 class="section-title">
+          <span class="line"><span>Van vraag tot</span></span>
+          <span class="line"><span>uitvoering.</span></span>
+        </h2>
+      </div>
+      <p>Een eenvoudig en transparant proces, zonder verrassingen onderweg.</p>
+    </div>
+
+    <div class="process-grid">
+      <div class="process-line-bg"></div>
+      <div class="process-line-progress" id="processProgress"></div>
+
+      <div class="process-step" data-step="1">
+        <div class="step-number">01</div>
+        <div class="step-image">
+          <img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=600&q=80" alt="Kennismaking">
+          <div class="step-image-overlay"></div>
+        </div>
+        <div class="step-title">Kennismaking</div>
+        <div class="step-desc">Gratis bezoek ter plaatse. We bekijken wat je nodig hebt.</div>
+      </div>
+      <div class="process-step" data-step="2">
+        <div class="step-number">02</div>
+        <div class="step-image">
+          <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=600&q=80" alt="Vaste offerte">
+          <div class="step-image-overlay"></div>
+        </div>
+        <div class="step-title">Vaste offerte</div>
+        <div class="step-desc">Heldere prijs vooraf. Geen verborgen kosten of meerwerk-facturen.</div>
+      </div>
+      <div class="process-step" data-step="3">
+        <div class="step-number">03</div>
+        <div class="step-image">
+          <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=600&q=80" alt="Uitvoering">
+          <div class="step-image-overlay"></div>
+        </div>
+        <div class="step-title">Uitvoering</div>
+        <div class="step-desc">Vakkundig werk volgens plan, met oog voor afwerking en duurzaamheid.</div>
+      </div>
+      <div class="process-step" data-step="4">
+        <div class="step-number">04</div>
+        <div class="step-image">
+          <img src="https://images.unsplash.com/photo-1444858291040-58f756a3bdd6?auto=format&fit=crop&w=600&q=80" alt="Oplevering en nazorg">
+          <div class="step-image-overlay"></div>
+        </div>
+        <div class="step-title">Oplevering & nazorg</div>
+        <div class="step-desc">Verzorgde afwerking en onderhoudsschema. We blijven bereikbaar voor advies.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="padding: 80px 5%; background: var(--bg);">
+  <div style="max-width: 900px; margin: 0 auto; text-align: center;">
+    <span class="section-tag section-tag-dark" style="margin-bottom: 16px; display: inline-block;">Wat Jan voor u doet</span>
+    <h2 class="section-title" style="margin-bottom: 32px;">
+      <span class="line"><span>Alles wat ik</span></span>
+      <span class="line"><span>voor u kan <span class="lime">doen.</span></span></span>
+    </h2>
+    <div class="pill-cloud">
+      <div class="pill-cloud-row">
+        <span class="pc-pill pc-lime" data-img="assets/action-harking.png">
+          <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15 L15 15 M5 11 L7 9 L10 12 L13 7"/></svg>
+          Gazon maaien
+        </span>
+        <span class="pc-pill pc-dark" data-img="assets/action-cutting-bush.png">
+          <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 4 L14 14 M14 4 L4 14"/></svg>
+          Hagen snoeien
+        </span>
+        <span class="pc-pill pc-moss" data-img="assets/action-cutting.png">
+          <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 13 Q9 5 15 13 M9 8 L9 13"/></svg>
+          Bomen snoeien
+        </span>
+      </div>
+      <div class="pill-cloud-row">
+        <span class="pc-pill pc-bright" data-img="assets/moss.png">
+          <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 14 Q4 9 4 5 Q4 3 6 3 Q8 3 9 6 Q10 3 12 3 Q14 3 14 5 Q14 9 9 14"/></svg>
+          Ontmossen
+        </span>
+        <span class="pc-pill pc-lime" data-img="assets/action-carrying-leaves.png">
+          <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 9 Q6 7 9 9 Q12 11 15 9 M3 13 Q6 11 9 13 Q12 15 15 13"/></svg>
+          Bladruimen
+        </span>
+        <span class="pc-pill pc-dark" data-img="assets/after-porch.png">
+          <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="7" r="3"/><path d="M3 15 Q3 11 9 11 Q15 11 15 15"/></svg>
+          Onkruid wieden
+        </span>
+      </div>
+      <div class="pill-cloud-row">
+        <span class="pc-pill pc-moss" data-img="assets/after-porch.png">
+          <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="9" width="12" height="6" rx="1"/><path d="M9 3 L9 9 M6 6 L9 3 L12 6"/></svg>
+          Terrassen reinigen
+        </span>
+        <span class="pc-pill pc-dark" data-img="assets/testimonial-garden.png">
+          <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 14 Q9 11 9 9 Q9 5 5 5 M9 9 Q9 5 13 5 M3 15 L15 15"/></svg>
+          Bemesten
+        </span>
+        <span class="pc-pill pc-lime" data-img="assets/testimonial-garden.png">
+          <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="5" height="5" rx="1"/><rect x="10" y="3" width="5" height="5" rx="1"/><rect x="3" y="10" width="5" height="5" rx="1"/><rect x="10" y="10" width="5" height="5" rx="1"/></svg>
+          Seizoenscontract
+        </span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS MARQUEE -->
+<section class="reviews-section">
+  <div class="reviews-header">
+    <div>
+      <span class="section-tag section-tag-dark">Reviews</span>
+      <h2 class="section-title">
+        <span class="line"><span>Wat klanten</span></span>
+        <span class="line"><span>zeggen.</span></span>
+      </h2>
+    </div>
+    <div class="google-summary">
+      <div class="google-summary-rating">
+        <span class="google-summary-stars">★★★★★</span>
+        <span class="google-summary-score">4.9</span>
+        <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      </div>
+      <a href="https://www.google.com/maps/place/Verdant" target="_blank" rel="noopener noreferrer" class="google-summary-count" aria-label="Bekijk alle reviews op Google">Gebaseerd op [TODO: AANTAL_REVIEWS] Google reviews ↗</a>
+    </div>
+  </div>
+
+  <div class="reviews-marquee">
+    <div class="reviews-track" id="reviewsTrack">
+      <!-- Cards duplicated for seamless loop -->
+      <div class="review-card" data-cursor="hover">
+        <div class="review-top">
+          <div class="review-avatar"><img src="assets/testimonial-buxus.png" alt="Marleen V."></div>
+          <div class="review-author">
+            <div class="review-name">Marleen Vandevelde</div>
+            <div class="review-meta">Local Guide · 14 reviews</div>
+          </div>
+        </div>
+        <div class="review-stars-row">
+          <span class="review-stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></span>
+          <span class="review-date">3 weken geleden</span>
+        </div>
+        <p class="review-text">Onze achtertuin volledig opnieuw aangelegd. Bart heeft een prachtig ontwerp gemaakt en de uitvoering was top. Alles netjes afgewerkt.</p>
+        <div class="review-google">
+          <svg width="11" height="11" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Geplaatst op Google
+        </div>
+      </div>
+
+      <div class="review-card" data-cursor="hover">
+        <div class="review-top">
+          <div class="review-avatar"><img src="assets/testimonial-1.png" alt="Peter D."></div>
+          <div class="review-author">
+            <div class="review-name">Peter Devos</div>
+            <div class="review-meta">7 reviews</div>
+          </div>
+        </div>
+        <div class="review-stars-row">
+          <span class="review-stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></span>
+          <span class="review-date">2 maanden geleden</span>
+        </div>
+        <p class="review-text">Volledige tuinaanleg gedaan voor onze nieuwbouw. Beplanting, terras en beregening. Resultaat is fantastisch en alles werkt perfect.</p>
+        <div class="review-google">
+          <svg width="11" height="11" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Geplaatst op Google
+        </div>
+      </div>
+
+            <div class="review-photo-card" data-cursor="hover">
+        <img src="https://images.unsplash.com/photo-1558904541-efa843a96f01?auto=format&fit=crop&w=600&q=80" alt="Tuinaanleg project">
+        <div class="review-photo-label">
+          <span class="review-photo-tag">Project</span>
+          Tuinaanleg Sint-Andries
+        </div>
+      </div>
+
+      <div class="review-card" data-cursor="hover">
+        <div class="review-top">
+          <div class="review-avatar"><img src="assets/testimonial-garden.png" alt="Stefan A."></div>
+          <div class="review-author">
+            <div class="review-name">Stefan Aerts</div>
+            <div class="review-meta">3 reviews</div>
+          </div>
+        </div>
+        <div class="review-stars-row">
+          <span class="review-stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></span>
+          <span class="review-date">4 maanden geleden</span>
+        </div>
+        <p class="review-text">Hagen gesnoeid en de oude beuken bijgewerkt. Vakkundig en met respect voor de bomen. Aanrader voor wie kwaliteit zoekt.</p>
+        <div class="review-google">
+          <svg width="11" height="11" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Geplaatst op Google
+        </div>
+      </div>
+
+            <div class="review-photo-card" data-cursor="hover">
+        <img src="https://images.unsplash.com/photo-1591857177580-dc82b9ac4e1e?auto=format&fit=crop&w=600&q=80" alt="Snoeiwerk project">
+        <div class="review-photo-label">
+          <span class="review-photo-tag">Project</span>
+          Snoeiwerk Oostkamp
+        </div>
+      </div>
+
+      <div class="review-card" data-cursor="hover">
+        <div class="review-top">
+          <div class="review-avatar">SB</div>
+          <div class="review-author">
+            <div class="review-name">Sofie Bracke</div>
+            <div class="review-meta">11 reviews</div>
+          </div>
+        </div>
+        <div class="review-stars-row">
+          <span class="review-stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></span>
+          <span class="review-date">5 maanden geleden</span>
+        </div>
+        <p class="review-text">Slechte ervaring gehad met een vorige tuinaannemer. Bart heeft alles hersteld en de tuin terug op punt gezet. Eerlijk en correct.</p>
+        <div class="review-google">
+          <svg width="11" height="11" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Geplaatst op Google
+        </div>
+      </div>
+
+            <div class="review-photo-card" data-cursor="hover">
+        <img src="https://images.unsplash.com/photo-1444858291040-58f756a3bdd6?auto=format&fit=crop&w=600&q=80" alt="Tuinverlichting project">
+        <div class="review-photo-label">
+          <span class="review-photo-tag">Project</span>
+          Tuinverlichting Knokke
+        </div>
+      </div>
+
+      <div class="review-card" data-cursor="hover">
+        <div class="review-top">
+          <div class="review-avatar">JV</div>
+          <div class="review-author">
+            <div class="review-name">Jan Vermeersch</div>
+            <div class="review-meta">5 reviews</div>
+          </div>
+        </div>
+        <div class="review-stars-row">
+          <span class="review-stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></span>
+          <span class="review-date">6 maanden geleden</span>
+        </div>
+        <p class="review-text">Met het seizoenscontract hoef ik nergens meer aan te denken. Elke twee weken staat mijn tuin er perfect bij. Beste investering voor mijn huis.</p>
+        <div class="review-google">
+          <svg width="11" height="11" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Geplaatst op Google
+        </div>
+      </div>
+
+      <!-- Duplicates for seamless loop -->
+      <div class="review-card" data-cursor="hover">
+        <div class="review-top">
+          <div class="review-avatar"><img src="assets/testimonial-buxus.png" alt="Marleen V."></div>
+          <div class="review-author">
+            <div class="review-name">Marleen Vandevelde</div>
+            <div class="review-meta">Local Guide · 14 reviews</div>
+          </div>
+        </div>
+        <div class="review-stars-row">
+          <span class="review-stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></span>
+          <span class="review-date">3 weken geleden</span>
+        </div>
+        <p class="review-text">Onze achtertuin volledig opnieuw aangelegd. Bart heeft een prachtig ontwerp gemaakt en de uitvoering was top. Alles netjes afgewerkt.</p>
+        <div class="review-google">
+          <svg width="11" height="11" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Geplaatst op Google
+        </div>
+      </div>
+
+      <div class="review-card" data-cursor="hover">
+        <div class="review-top">
+          <div class="review-avatar"><img src="assets/testimonial-1.png" alt="Peter D."></div>
+          <div class="review-author">
+            <div class="review-name">Peter Devos</div>
+            <div class="review-meta">7 reviews</div>
+          </div>
+        </div>
+        <div class="review-stars-row">
+          <span class="review-stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></span>
+          <span class="review-date">2 maanden geleden</span>
+        </div>
+        <p class="review-text">Volledige tuinaanleg gedaan voor onze nieuwbouw. Beplanting, terras en beregening. Resultaat is fantastisch en alles werkt perfect.</p>
+        <div class="review-google">
+          <svg width="11" height="11" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Geplaatst op Google
+        </div>
+      </div>
+
+            <div class="review-photo-card" data-cursor="hover">
+        <img src="https://images.unsplash.com/photo-1558904541-efa843a96f01?auto=format&fit=crop&w=600&q=80" alt="Tuinaanleg project">
+        <div class="review-photo-label">
+          <span class="review-photo-tag">Project</span>
+          Tuinaanleg Sint-Andries
+        </div>
+      </div>
+
+      <div class="review-card" data-cursor="hover">
+        <div class="review-top">
+          <div class="review-avatar"><img src="assets/testimonial-garden.png" alt="Stefan A."></div>
+          <div class="review-author">
+            <div class="review-name">Stefan Aerts</div>
+            <div class="review-meta">3 reviews</div>
+          </div>
+        </div>
+        <div class="review-stars-row">
+          <span class="review-stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></span>
+          <span class="review-date">4 maanden geleden</span>
+        </div>
+        <p class="review-text">Hagen gesnoeid en de oude beuken bijgewerkt. Vakkundig en met respect voor de bomen. Aanrader voor wie kwaliteit zoekt.</p>
+        <div class="review-google">
+          <svg width="11" height="11" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Geplaatst op Google
+        </div>
+      </div>
+
+            <div class="review-photo-card" data-cursor="hover">
+        <img src="https://images.unsplash.com/photo-1591857177580-dc82b9ac4e1e?auto=format&fit=crop&w=600&q=80" alt="Snoeiwerk project">
+        <div class="review-photo-label">
+          <span class="review-photo-tag">Project</span>
+          Snoeiwerk Oostkamp
+        </div>
+      </div>
+
+      <div class="review-card" data-cursor="hover">
+        <div class="review-top">
+          <div class="review-avatar">SB</div>
+          <div class="review-author">
+            <div class="review-name">Sofie Bracke</div>
+            <div class="review-meta">11 reviews</div>
+          </div>
+        </div>
+        <div class="review-stars-row">
+          <span class="review-stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></span>
+          <span class="review-date">5 maanden geleden</span>
+        </div>
+        <p class="review-text">Slechte ervaring gehad met een vorige tuinaannemer. Bart heeft alles hersteld en de tuin terug op punt gezet. Eerlijk en correct.</p>
+        <div class="review-google">
+          <svg width="11" height="11" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Geplaatst op Google
+        </div>
+      </div>
+
+            <div class="review-photo-card" data-cursor="hover">
+        <img src="https://images.unsplash.com/photo-1444858291040-58f756a3bdd6?auto=format&fit=crop&w=600&q=80" alt="Tuinverlichting project">
+        <div class="review-photo-label">
+          <span class="review-photo-tag">Project</span>
+          Tuinverlichting Knokke
+        </div>
+      </div>
+
+      <div class="review-card" data-cursor="hover">
+        <div class="review-top">
+          <div class="review-avatar">JV</div>
+          <div class="review-author">
+            <div class="review-name">Jan Vermeersch</div>
+            <div class="review-meta">5 reviews</div>
+          </div>
+        </div>
+        <div class="review-stars-row">
+          <span class="review-stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></span>
+          <span class="review-date">6 maanden geleden</span>
+        </div>
+        <p class="review-text">Met het seizoenscontract hoef ik nergens meer aan te denken. Elke twee weken staat mijn tuin er perfect bij. Beste investering voor mijn huis.</p>
+        <div class="review-google">
+          <svg width="11" height="11" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Geplaatst op Google
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="faq-section luvi-bg-wrap" id="faq">
+  <div class="luvi-grid-bg"></div>
+  <div class="luvi-aurora-1"></div>
+  <div class="luvi-aurora-2"></div>
+  <div class="container" style="position: relative; z-index: 2;">
+    <div class="faq-grid">
+      <div>
+        <span class="section-tag section-tag-light">FAQ</span>
+        <h2 class="section-title">
+          <span class="line"><span>Vragen?</span></span>
+          <span class="line"><span>antwoorden.</span></span>
+        </h2>
+        <p>Antwoorden op de vragen die we het vaakst krijgen. Iets anders? Bel ons gerust.</p>
+
+        <div class="faq-image">
+          <img src="https://images.unsplash.com/photo-1558904541-efa843a96f01?auto=format&fit=crop&w=600&q=80" alt="Tuinier aan het werk">
+          <div class="faq-image-badge">Geen vraag te klein</div>
+        </div>
+      </div>
+      <div class="faq-list">
+        <details class="faq-item" data-cursor="hover">
+          <summary>Hoe snel kunnen jullie langskomen?</summary>
+          <p>Voor offertes in Brugge en omstreken zijn we meestal binnen 1 week ter plaatse. Voor dringend onderhoud (zoals een gevallen boom of beregeningsstoring) reageren we binnen 24 uur.</p>
+        </details>
+        <details class="faq-item" data-cursor="hover">
+          <summary>Werken jullie BIO-gecertificeerd en verzekerd?</summary>
+          <p>Ja, we zijn officieel BIO-gecertificeerd voor ecologisch tuinbeheer en BA-verzekerd. Bij elke nieuwe aanleg wordt een aanlegplan + beplantingsschema meegeleverd.</p>
+        </details>
+        <details class="faq-item" data-cursor="hover">
+          <summary>Doen jullie ook onderhoudscontracten?</summary>
+          <p>Zeker. We bieden jaarcontracten op maat: van 4 onderhoudsbeurten per jaar tot wekelijks bezoek. Vaste prijs, geen verrassingen.</p>
+        </details>
+        <details class="faq-item" data-cursor="hover">
+          <summary>Hoe verloopt een offerte?</summary>
+          <p>We komen eerst gratis langs om de tuin te bekijken en je wensen te bespreken. Daarna sturen we een vaste prijsofferte met beplantingsplan. We starten pas na jouw akkoord.</p>
+        </details>
+        <details class="faq-item" data-cursor="hover">
+          <summary>Doen jullie ook kleine klussen?</summary>
+          <p>Zeker. Een haag snoeien, een plant vervangen, een terras heraanleggen: elke klus krijgt dezelfde aandacht als een volledige tuinaanleg.</p>
+        </details>
+
+        <!-- FAQ post-CTA -->
+        <div class="faq-cta">
+          <span>Geen antwoord op je vraag?</span>
+          <div class="faq-cta-buttons">
+            <a href="tel:+320000000000" class="faq-cta-link faq-cta-tel" aria-label="Bel ons op [TODO: TELEFOONNUMMER]">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57-.35-.11-.74-.03-1.02.24l-2.2 2.2c-2.83-1.44-5.15-3.75-6.59-6.59l2.2-2.21c.28-.26.36-.65.25-1C8.7 6.45 8.5 5.25 8.5 4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1z"/></svg>
+              Bel ons
+            </a>
+            <a href="https://wa.me/32000000000?text=Hallo%20Verdant%2C%20ik%20heb%20een%20vraag." class="faq-cta-link faq-cta-wa" target="_blank" rel="noopener noreferrer" aria-label="Stuur WhatsApp">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.297-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              WhatsApp
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="map-section" id="werkgebied">
+  <div class="map-grid">
+    <div class="map-content">
+      <span class="section-tag section-tag-dark">Werkgebied</span>
+      <h2 class="section-title">
+        <span class="line"><span>Wij komen</span></span>
+        <span class="line"><span>tot bij jou.</span></span>
+      </h2>
+      <p>Klik op een gemeente om te zien waar we werken. Woon je net buiten de regio? Bel ons gerust, we kijken wat mogelijk is.</p>
+
+      <button class="areas-toggle" id="areas-toggle" aria-expanded="false" aria-controls="areas">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+        Werkgebied tonen
+      </button>
+      <div class="areas" id="areas">
+        <button class="area-chip" data-lat="51.2093" data-lng="3.2247" data-name="Brugge (HQ)">Brugge</button>
+        <button class="area-chip" data-lat="51.2073" data-lng="3.1900" data-name="Sint-Andries">Sint-Andries</button>
+        <button class="area-chip" data-lat="51.1900" data-lng="3.2100" data-name="Sint-Michiels">Sint-Michiels</button>
+        <button class="area-chip" data-lat="51.2000" data-lng="3.2500" data-name="Assebroek">Assebroek</button>
+        <button class="area-chip" data-lat="51.2200" data-lng="3.2600" data-name="Sint-Kruis">Sint-Kruis</button>
+        <button class="area-chip" data-lat="51.1500" data-lng="3.2400" data-name="Oostkamp">Oostkamp</button>
+        <button class="area-chip" data-lat="51.1330" data-lng="3.3380" data-name="Beernem">Beernem</button>
+        <button class="area-chip" data-lat="51.2510" data-lng="3.2840" data-name="Damme">Damme</button>
+        <button class="area-chip" data-lat="51.3470" data-lng="3.2900" data-name="Knokke-Heist">Knokke-Heist</button>
+        <button class="area-chip" data-lat="51.3130" data-lng="3.1310" data-name="Blankenberge">Blankenberge</button>
+        <button class="area-chip" data-lat="51.1500" data-lng="3.1830" data-name="Zedelgem">Zedelgem</button>
+        <button class="area-chip" data-lat="51.1830" data-lng="3.0900" data-name="Jabbeke">Jabbeke</button>
+      </div>
+    </div>
+
+    <div class="map-wrapper">
+      <div class="map-overlay">
+        <div class="map-overlay-title">Geselecteerd</div>
+        <div class="map-overlay-city" id="selected-city">Brugge, BE</div>
+      </div>
+      <div id="map"></div>
+    </div>
+  </div>
+</section>
+
+<section class="final-cta">
+  <div class="cta-bg">
+    <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=2000&q=80" alt="">
+  </div>
+  <div class="cta-rings">
+    <div class="cta-ring"></div>
+    <div class="cta-ring"></div>
+    <div class="cta-ring"></div>
+    <div class="cta-ring"></div>
+  </div>
+  <h2>
+    <span style="display:block;">Laat ons</span>
+    <span style="display:block;">even bellen.</span>
+  </h2>
+  <p>Eén telefoontje volstaat. Of stuur een WhatsApp, dan reageren we snel.</p>
+  <div class="final-cta-buttons">
+    <a href="tel:+320000000000" class="btn btn-dark-light magnetic btn-cta-final" data-cursor="hover" aria-label="Bel ons op [TODO: TELEFOONNUMMER]">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57-.35-.11-.74-.03-1.02.24l-2.2 2.2c-2.83-1.44-5.15-3.75-6.59-6.59l2.2-2.21c.28-.26.36-.65.25-1C8.7 6.45 8.5 5.25 8.5 4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1z"/></svg>
+      <span>[TODO: TELEFOONNUMMER]</span>
+    </a>
+    <a href="https://wa.me/32000000000?text=Hallo%20Verdant%2C%20ik%20heb%20een%20vraag." class="btn btn-whatsapp magnetic btn-cta-final" data-cursor="hover" target="_blank" rel="noopener noreferrer" aria-label="Stuur een WhatsApp bericht">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.297-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      <span>WhatsApp</span>
+    </a>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="footer-content">
+    <div class="footer-brand">
+      <a href="#" class="logo" aria-label="Verdant homepage">
+        <div class="logo-mark">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75C7 8 17 8 17 8z"/></svg>
+        </div>
+        <div class="logo-text">Verdant<span>EST. 2010</span></div>
+      </a>
+      <p>Erkend tuinier in Brugge en omstreken. BIO-gecertificeerd, betrouwbaar, betaalbaar.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <a href="tel:+320000000000">[TODO: TELEFOONNUMMER]</a>
+      <!-- TODO: [EMAIL] -->
+      <a href="mailto:[TODO: EMAIL]">[TODO: EMAIL]</a>
+      <!-- TODO: [ADRES] -->
+      <p>[TODO: ADRES]</p>
+    </div>
+    <div class="footer-col">
+      <h4>Uren</h4>
+      <p>Ma-vr: 07:30–18:00</p>
+      <p>Za: 08:00–13:00</p>
+      <p>Zo: gesloten</p>
+    </div>
+    <div class="footer-col">
+      <h4>Official</h4>
+      <!-- TODO: [BTW_NUMMER] -->
+      <p>[TODO: BTW_NUMMER]</p>
+      <p>BIO erkend</p>
+      <p>BA verzekerd</p>
+    </div>
+  </div>
+  <div class="copyright">© 2026 Verdant Tuinaanleg · Alle rechten voorbehouden</div>
+</footer>
+
+<script>
+  gsap.registerPlugin(ScrollTrigger);
+
+  // ============================================
+  // DEVICE DETECTION (eerst, vóór alle gebruik)
+  // ============================================
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  const isTouch = window.matchMedia('(hover: none)').matches;
+
+  // Refresh ScrollTrigger after resize (incl. orientation change)
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 250);
+  });
+
+  // Video failsafe: als video niet laadt of niet kan afspelen, toon poster
+  const heroVideo = document.querySelector('.hero-video video');
+  if (heroVideo) {
+    let videoLoaded = false;
+    heroVideo.addEventListener('loadeddata', () => { videoLoaded = true; });
+    heroVideo.addEventListener('error', () => {
+      const poster = heroVideo.getAttribute('poster');
+      if (poster) {
+        heroVideo.outerHTML = `<img src="${poster}" alt="Tuinier" style="width:100%;height:100%;object-fit:cover;">`;
+      }
+    });
+    // Force fallback na 4 sec als nog niet geladen
+    setTimeout(() => {
+      if (!videoLoaded && heroVideo.readyState < 2) {
+        const poster = heroVideo.getAttribute('poster');
+        if (poster && heroVideo.parentNode) {
+          heroVideo.outerHTML = `<img src="${poster}" alt="Tuinier" style="width:100%;height:100%;object-fit:cover;">`;
+        }
+      }
+    }, 4000);
+    // Force play on touch devices
+    heroVideo.play().catch(() => {});
+  }
+
+  // ============================================
+  // CURSOR
+  // ============================================
+  const cursorDot = document.querySelector('.cursor-dot');
+  const cursorBlob = document.querySelector('.cursor-blob');
+  let mX = 0, mY = 0, dX = 0, dY = 0, bX = 0, bY = 0;
+  document.addEventListener('mousemove', e => { mX = e.clientX; mY = e.clientY; });
+  function animCursor() {
+    dX += (mX - dX) * 0.9; dY += (mY - dY) * 0.9;
+    bX += (mX - bX) * 0.15; bY += (mY - bY) * 0.15;
+    if (cursorDot) cursorDot.style.transform = `translate(${dX}px, ${dY}px) translate(-50%, -50%)`;
+    if (cursorBlob) cursorBlob.style.transform = `translate(${bX}px, ${bY}px) translate(-50%, -50%)`;
+    requestAnimationFrame(animCursor);
+  }
+  animCursor();
+  document.querySelectorAll('[data-cursor="hover"]').forEach(el => {
+    el.addEventListener('mouseenter', () => cursorBlob?.classList.add('hover'));
+    el.addEventListener('mouseleave', () => cursorBlob?.classList.remove('hover'));
+  });
+
+  // NAV
+  const nav = document.getElementById('nav');
+  const lightSections = document.querySelectorAll('.intro, .process, .faq-section');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) nav.classList.add('scrolled'); else nav.classList.remove('scrolled');
+    let onLight = false;
+    lightSections.forEach(s => {
+      const r = s.getBoundingClientRect();
+      if (r.top <= 70 && r.bottom >= 70) onLight = true;
+    });
+    if (onLight) nav.classList.add('on-light'); else nav.classList.remove('on-light');
+  });
+
+  // HERO ENTRY — paused, triggered by intro sequence
+  gsap.set('.nav', { opacity: 0, y: -16 });
+  gsap.set('.hero-meta, .hero-sub, .cta-group, .hero-float-card', { opacity: 0, y: 24 });
+  const heroTl = gsap.timeline({ paused: true });
+  heroTl
+    .to('.nav', { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' })
+    .to('.hero-meta', { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }, '-=0.3')
+    .to('h1 .word', { y: 0, duration: 1.1, ease: 'power4.out', stagger: 0.08 }, '-=0.4')
+    .to('.hero-sub', { opacity: 1, y: 0, duration: 0.9, ease: 'power2.out' }, '-=0.5')
+    .to('.cta-group', { opacity: 1, y: 0, duration: 0.9, ease: 'power2.out' }, '-=0.6')
+    .to('.hero-float-card', { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }, '-=0.4');
+
+  // SITE INTRO SEQUENCE
+  const siteIntro   = document.getElementById('site-intro');
+  const introBg     = document.getElementById('intro-bg');
+  const introWrap   = document.getElementById('intro-logo-wrap');
+  const introMark   = document.getElementById('intro-mark');
+  const introName   = document.getElementById('intro-name');
+  const introTag    = document.getElementById('intro-tagline');
+  const introLine   = document.getElementById('intro-line');
+
+  gsap.timeline()
+    .to(introMark, { scale: 1, rotation: 0, duration: 0.85, ease: 'back.out(1.7)', delay: 0.25 })
+    .call(() => introMark.classList.add('shimmer'), null, '-=0.1')
+    .to(introMark, { boxShadow: '0 0 64px rgba(194,221,98,0.55)', duration: 0.45, ease: 'power2.out' }, '-=0.25')
+    .to(introName, { opacity: 1, y: 0, duration: 0.65, ease: 'power3.out' }, '-=0.3')
+    .to(introTag, { opacity: 1, duration: 0.5, ease: 'power2.out' }, '-=0.15')
+    .to(introLine, { width: '100%', duration: 1.3, ease: 'power1.inOut' }, '-=0.1')
+    .to(introBg, { opacity: 0, duration: 1.1, ease: 'power2.inOut', delay: 0.15 })
+    .to(introWrap, { scale: 1.04, duration: 0.35, ease: 'power1.out' }, '-=0.55')
+    .to(introWrap, { opacity: 0, scale: 0.94, duration: 0.65, ease: 'power2.in' }, '-=0.05')
+    .to(introLine, { opacity: 0, duration: 0.3 }, '-=0.4')
+    .set(siteIntro, { display: 'none' })
+    .call(() => heroTl.play());
+
+  // ⚡ HERO LIGHTNING FLASH at random intervals - alleen desktop
+  const heroFlash = document.getElementById('heroFlash');
+  function triggerLightning() {
+    if (!heroFlash) return;
+    gsap.to(heroFlash, {
+      opacity: 1, duration: 0.05,
+      onComplete: () => {
+        gsap.to(heroFlash, { opacity: 0, duration: 0.3 });
+        setTimeout(() => {
+          gsap.to(heroFlash, {
+            opacity: 0.6, duration: 0.05,
+            onComplete: () => gsap.to(heroFlash, { opacity: 0, duration: 0.4 })
+          });
+        }, 100);
+      }
+    });
+    setTimeout(triggerLightning, 6000 + Math.random() * 6000);
+  }
+  if (!isMobile) {
+    setTimeout(triggerLightning, 3000);
+  }
+
+  // MAGNETIC - fixed: zwakker effect + zorg dat children pointer-events ignoren
+  document.querySelectorAll('.magnetic').forEach(btn => {
+    // Skip on touch devices
+    if (window.matchMedia('(hover: none)').matches) return;
+
+    btn.addEventListener('mousemove', e => {
+      const r = btn.getBoundingClientRect();
+      // Verzwakt naar 0.15 zodat de button binnen bereik van cursor blijft
+      const x = (e.clientX - r.left - r.width/2) * 0.15;
+      const y = (e.clientY - r.top - r.height/2) * 0.15;
+      gsap.to(btn, { x, y, duration: 0.4, ease: 'power2.out' });
+    });
+    btn.addEventListener('mouseleave', () => {
+      gsap.to(btn, { x: 0, y: 0, duration: 0.6, ease: 'elastic.out(1, 0.3)' });
+    });
+  });
+
+  // ============================================
+  // HERO GRID MOUSE-FOLLOW GLOW + subtle scale
+  // ============================================
+  const heroGrid = document.getElementById('heroGrid');
+  const heroElement = document.querySelector('.hero');
+
+  if (heroGrid && heroElement && !isTouch) {
+    let targetX = 50, targetY = 50; // percentage
+    let currentX = 50, currentY = 50;
+    let mouseActive = false;
+    let inactivityTimer;
+
+    heroElement.addEventListener('mousemove', (e) => {
+      const rect = heroElement.getBoundingClientRect();
+      targetX = ((e.clientX - rect.left) / rect.width) * 100;
+      targetY = ((e.clientY - rect.top) / rect.height) * 100;
+
+      if (!mouseActive) {
+        heroGrid.classList.add('mouse-active');
+        mouseActive = true;
+      }
+
+      // Reset inactivity timer
+      clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(() => {
+        heroGrid.classList.remove('mouse-active');
+        mouseActive = false;
+      }, 800);
+    });
+
+    heroElement.addEventListener('mouseleave', () => {
+      heroGrid.classList.remove('mouse-active');
+      mouseActive = false;
+      // Glow zacht terug naar center
+      targetX = 50;
+      targetY = 50;
+    });
+
+    // Smooth lerp loop voor subtiele beweging
+    function animateGrid() {
+      // Lerp speed: lager = trager/zachter (0.08 = heel smooth)
+      currentX += (targetX - currentX) * 0.08;
+      currentY += (targetY - currentY) * 0.08;
+
+      heroGrid.style.setProperty('--mouse-x', currentX + '%');
+      heroGrid.style.setProperty('--mouse-y', currentY + '%');
+
+      requestAnimationFrame(animateGrid);
+    }
+    animateGrid();
+  }
+
+  // ============================================
+  // VIDEO MOBILE PLAY HANDLING
+  // ============================================
+  // Force play video on mobile (needed for iOS Safari)
+  if (heroVideo) {
+    const tryPlay = () => {
+      heroVideo.play().catch(() => {});
+    };
+    document.addEventListener('touchstart', tryPlay, { once: true });
+    document.addEventListener('click', tryPlay, { once: true });
+  }
+
+  // SECTION TITLES
+  gsap.utils.toArray('.section-title').forEach(title => {
+    const words = title.querySelectorAll('.line > span');
+    gsap.set(words, { y: '110%' });
+    ScrollTrigger.create({
+      trigger: title, start: 'top 95%', toggleActions: 'play none none none',
+      onEnter: () => gsap.to(words, { y: 0, duration: 0.9, ease: 'power4.out', stagger: 0.08 })
+    });
+  });
+
+  // INTRO IMAGE MASK
+  ScrollTrigger.create({
+    trigger: '.intro-image', start: 'top 90%', toggleActions: 'play none none none',
+    onEnter: () => {
+      gsap.to('.intro-image .mask', { scaleY: 0, duration: 1.2, ease: 'power4.inOut' });
+      gsap.to('.intro-image img', { scale: 1, duration: 1.4, ease: 'power4.out' });
+    }
+  });
+
+
+  // SERVICE CARDS - failsafe: zet opacity 1 als batch faalt
+  gsap.set('.service-card', { opacity: 1 }); // start zichtbaar
+  ScrollTrigger.batch('.service-card', {
+    start: 'top 100%',
+    onEnter: batch => gsap.from(batch, { opacity: 0, y: 40, duration: 0.7, stagger: 0.08, ease: 'power3.out', overwrite: true })
+  });
+
+  // BA CASES - failsafe
+  gsap.set('.ba-case', { opacity: 1 });
+  ScrollTrigger.batch('.ba-case', {
+    start: 'top 100%',
+    onEnter: batch => gsap.from(batch, { opacity: 0, y: 50, duration: 0.8, stagger: 0.15, ease: 'power3.out', overwrite: true })
+  });
+
+  // ⚡ PROCESS - LINE DRAWS WHILE SCROLLING + STEPS ACTIVATE ONE BY ONE
+  const processProgress = document.getElementById('processProgress');
+  const processSteps = document.querySelectorAll('.process-step');
+
+  ScrollTrigger.create({
+    trigger: '.process-grid',
+    start: 'top 70%',
+    end: 'bottom 70%',
+    scrub: 0.5,
+    onUpdate: self => {
+      const progress = self.progress; // 0 to 1
+      // Width is 75% (12.5% margins on both sides)
+      const lineWidth = progress * 75;
+      processProgress.style.width = `${lineWidth}%`;
+
+      // Activate steps as line passes them
+      processSteps.forEach((step, i) => {
+        const stepProgress = (i + 1) / 4;
+        const num = step.querySelector('.step-number');
+        if (progress >= stepProgress - 0.1 && !num.classList.contains('active')) {
+          num.classList.add('active');
+        } else if (progress < stepProgress - 0.15) {
+          num.classList.remove('active');
+        }
+      });
+    }
+  });
+
+  // ⚡ REVIEWS MARQUEE - pause on hover
+  const reviewsTrack = document.getElementById('reviewsTrack');
+  if (reviewsTrack) {
+    reviewsTrack.addEventListener('mouseenter', () => reviewsTrack.classList.add('paused'));
+    reviewsTrack.addEventListener('mouseleave', () => reviewsTrack.classList.remove('paused'));
+  }
+
+  // BANNER PARALLAX - niet op mobile (kan flickeren)
+  if (!isMobile) {
+    gsap.utils.toArray('.banner img').forEach(img => {
+      gsap.to(img, {
+        yPercent: 15, ease: 'none',
+        scrollTrigger: { trigger: img.closest('.banner'), start: 'top bottom', end: 'bottom top', scrub: true }
+      });
+    });
+  }
+
+  // ============================================
+  // ⚡ BEFORE/AFTER - AUTO-ANIMATED + DRAG
+  // ============================================
+  document.querySelectorAll('[data-ba]').forEach((wrapper, idx) => {
+    const after = wrapper.querySelector('.ba-img.after');
+    const handle = wrapper.querySelector('.ba-handle');
+    let isDown = false;
+    let autoTween = null;
+    let isPaused = false;
+
+    function update(percent) {
+      percent = Math.max(0, Math.min(100, percent));
+      after.style.clipPath = `inset(0 0 0 ${percent}%)`;
+      handle.style.left = `${percent}%`;
+    }
+
+    function getPercent(e) {
+      const rect = wrapper.getBoundingClientRect();
+      const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+      return (x / rect.width) * 100;
+    }
+
+    // AUTO ANIMATION - loops back and forth
+    function startAuto() {
+      if (autoTween) autoTween.kill();
+      const obj = { p: 50 };
+      autoTween = gsap.timeline({ repeat: -1 });
+      autoTween
+        .to(obj, { p: 20, duration: 3, ease: 'power1.inOut', onUpdate: () => update(obj.p) })
+        .to(obj, { p: 80, duration: 3, ease: 'power1.inOut', onUpdate: () => update(obj.p) })
+        .to(obj, { p: 50, duration: 2, ease: 'power1.inOut', onUpdate: () => update(obj.p) });
+      // Stagger animations slightly per slider
+      autoTween.timeScale(1).seek(idx * 1.5);
+    }
+
+    function pauseAuto() {
+      if (autoTween) autoTween.pause();
+      isPaused = true;
+    }
+
+    function resumeAuto() {
+      if (!isDown && autoTween) {
+        autoTween.play();
+        isPaused = false;
+      }
+    }
+
+    // Start when in view
+    ScrollTrigger.create({
+      trigger: wrapper,
+      start: 'top 80%',
+      toggleActions: 'play none none none',
+      onEnter: () => startAuto()
+    });
+
+    // Mouse / touch interactions
+    wrapper.addEventListener('mouseenter', pauseAuto);
+    wrapper.addEventListener('mouseleave', () => { if (!isDown) resumeAuto(); });
+
+    wrapper.addEventListener('mousedown', e => {
+      isDown = true;
+      pauseAuto();
+      wrapper.classList.add('dragging');
+      update(getPercent(e));
+    });
+    wrapper.addEventListener('touchstart', e => {
+      isDown = true;
+      pauseAuto();
+      wrapper.classList.add('dragging');
+      update(getPercent(e));
+    }, { passive: true });
+
+    window.addEventListener('mousemove', e => { if (isDown) update(getPercent(e)); });
+    window.addEventListener('touchmove', e => { if (isDown) update(getPercent(e)); }, { passive: true });
+    window.addEventListener('mouseup', () => {
+      if (isDown) {
+        isDown = false;
+        wrapper.classList.remove('dragging');
+      }
+    });
+    window.addEventListener('touchend', () => {
+      if (isDown) {
+        isDown = false;
+        wrapper.classList.remove('dragging');
+      }
+    });
+
+    wrapper.addEventListener('mousemove', e => {
+      if (e.buttons === 1 && isDown) update(getPercent(e));
+    });
+  });
+
+  // ============================================
+  // LEAFLET MAP - HQ PIN + AREA MARKERS
+  // ============================================
+  const map = L.map('map', {
+    zoomControl: false,
+    scrollWheelZoom: false,
+    dragging: !isTouch,
+    tap: false,
+    attributionControl: false,
+    touchZoom: false,
+    doubleClickZoom: false,
+    boxZoom: false,
+    keyboard: false
+  }).setView([51.2093, 3.2247], 11);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+
+  // HQ icon - distinctive pin with lightning bolt
+  const hqIcon = L.divIcon({
+    className: 'custom-marker-hq',
+    html: `
+      <div class="marker-hq">
+        <div class="marker-hq-ring"></div>
+        <div class="marker-hq-pin"></div>
+        <svg class="marker-hq-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h7l-1 8 11-14h-7l1-6z"/></svg>
+        <div class="marker-hq-label">HQ · Verdant</div>
+      </div>
+    `,
+    iconSize: [40, 50],
+    iconAnchor: [20, 50]
+  });
+
+  // Normal area dot
+  const areaIcon = L.divIcon({
+    className: 'custom-marker',
+    html: '<div class="marker-pulse"></div>',
+    iconSize: [16, 16],
+    iconAnchor: [8, 8]
+  });
+  const activeIcon = L.divIcon({
+    className: 'custom-marker',
+    html: '<div class="marker-pulse active"></div>',
+    iconSize: [22, 22],
+    iconAnchor: [11, 11]
+  });
+
+  const markers = {};
+  const chips = document.querySelectorAll('.area-chip');
+  const selectedCity = document.getElementById('selected-city');
+
+  chips.forEach(chip => {
+    const lat = parseFloat(chip.dataset.lat);
+    const lng = parseFloat(chip.dataset.lng);
+    const name = chip.dataset.name;
+    const isHQ = name.includes('HQ');
+
+    const m = L.marker([lat, lng], {
+      icon: isHQ ? hqIcon : areaIcon,
+      zIndexOffset: isHQ ? 1000 : 0
+    }).addTo(map);
+
+    if (!isHQ) {
+      m.bindTooltip(name, {
+        direction: 'top',
+        offset: [0, -10],
+        className: 'custom-tooltip'
+      });
+    }
+
+    markers[name] = { marker: m, isHQ: isHQ };
+    m.on('click', () => activate(name, lat, lng));
+    chip.addEventListener('click', () => activate(name, lat, lng));
+  });
+
+  function activate(name, lat, lng) {
+    chips.forEach(c => c.classList.remove('active'));
+    const targetChip = Array.from(chips).find(c => c.dataset.name === name);
+    if (targetChip) {
+      targetChip.classList.remove('active');
+      void targetChip.offsetWidth;
+      targetChip.classList.add('active');
+    }
+    // Reset only non-HQ markers
+    Object.entries(markers).forEach(([n, data]) => {
+      if (!data.isHQ) data.marker.setIcon(areaIcon);
+    });
+    // Highlight selected (if not HQ - HQ already styled)
+    const target = markers[name];
+    if (target) {
+      if (!target.isHQ) {
+        target.marker.setIcon(activeIcon);
+        target.marker.openTooltip();
+      }
+    }
+    map.flyTo([lat, lng], 13, { duration: 1.2 });
+    selectedCity.textContent = name.replace(' (HQ)', '') + ', BE';
+  }
+
+  // Initial: activate HQ chip
+  const hqChip = document.querySelector('.area-chip[data-name*="HQ"]');
+  if (hqChip) hqChip.classList.add('active');
+
+  L.circle([51.2093, 3.2247], {
+    color: '#C2DD62',
+    fillColor: '#C2DD62',
+    fillOpacity: 0.05,
+    weight: 1,
+    radius: 18000
+  }).addTo(map);
+</script>
+
+<style>
+  .leaflet-tooltip.custom-tooltip { background: var(--bg); border: 1px solid var(--lime); color: var(--lime); font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; padding: 6px 10px; border-radius: 4px; box-shadow: 0 0 12px rgba(212,255,38,0.3); }
+  .leaflet-tooltip.custom-tooltip::before { display: none; }
+  .leaflet-container { background: var(--bg-2); }
+</style>
+
+<script>
+(function(){
+  var preview=document.createElement('div');
+  preview.className='pill-img-preview';
+  var img=document.createElement('img');
+  img.alt='';
+  preview.appendChild(img);
+  document.body.appendChild(preview);
+  document.querySelectorAll('.pc-pill[data-img]').forEach(function(pill){
+    pill.addEventListener('mouseenter',function(){
+      img.src=pill.dataset.img;
+      preview.classList.add('visible');
+    });
+    pill.addEventListener('mousemove',function(e){
+      var x=e.clientX+20, y=Math.max(10,e.clientY-80);
+      if(x+220>window.innerWidth) x=e.clientX-240;
+      preview.style.left=x+'px';
+      preview.style.top=y+'px';
+    });
+    pill.addEventListener('mouseleave',function(){
+      preview.classList.remove('visible');
+    });
+  });
+})();
+
+// ── FAQ Smooth Accordion ──────────────────────────────────────────
+(function(){
+  document.querySelectorAll('.faq-item').forEach(function(item){
+    var summary = item.querySelector('summary');
+    var body = item.querySelector('p');
+    if (!body) return;
+    var wrap = document.createElement('div');
+    wrap.className = 'faq-body';
+    body.parentNode.insertBefore(wrap, body);
+    wrap.appendChild(body);
+    summary.addEventListener('click', function(e){
+      e.preventDefault();
+      var isOpen = item.hasAttribute('open');
+      if (isOpen) {
+        wrap.style.maxHeight = wrap.scrollHeight + 'px';
+        requestAnimationFrame(function(){
+          requestAnimationFrame(function(){ wrap.style.maxHeight = '0'; });
+        });
+        setTimeout(function(){ item.removeAttribute('open'); }, 340);
+      } else {
+        item.setAttribute('open', '');
+        wrap.style.maxHeight = wrap.scrollHeight + 'px';
+        setTimeout(function(){ wrap.style.maxHeight = 'none'; }, 340);
+      }
+    });
+  });
+})();
+
+// ── Before/After Project Switcher ────────────────────────────────
+(function(){
+  var tabs = document.querySelectorAll('.ba-tab');
+  var cases = document.querySelectorAll('.ba-case');
+  if (!tabs.length || !cases.length) return;
+  cases[0].classList.add('active');
+  tabs.forEach(function(tab){
+    tab.addEventListener('click', function(){
+      var idx = parseInt(tab.dataset.case, 10);
+      tabs.forEach(function(t){ t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
+      cases.forEach(function(c){ c.classList.remove('active'); });
+      tab.classList.add('active');
+      tab.setAttribute('aria-selected','true');
+      if (cases[idx]) cases[idx].classList.add('active');
+    });
+  });
+})();
+
+// ── Map Area Chips Toggle ─────────────────────────────────────────
+(function(){
+  var btn = document.getElementById('areas-toggle');
+  var areas = document.getElementById('areas');
+  if (!btn || !areas) return;
+  btn.addEventListener('click', function(){
+    var open = areas.classList.toggle('open');
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    btn.childNodes[btn.childNodes.length - 1].textContent = open ? ' Werkgebied verbergen' : ' Werkgebied tonen';
+  });
+})();
+</script>
+
+<!-- ── FAQ Chatbot Widget ───────────────────────────────────────── -->
+<button id="faq-btn" aria-label="Stel een vraag" aria-expanded="false" aria-controls="faq-panel">
+  <svg fill="none" viewBox="0 0 24 24" stroke="var(--bg)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </svg>
+  <span class="faq-dot" aria-hidden="true"></span>
+</button>
+
+<div id="faq-panel" role="dialog" aria-label="Chatbot" aria-modal="true">
+  <div class="faq-header">
+    <div class="faq-header-logo">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66L7 19c.93-1.32 2.29-3 4-3 2 0 3 1 5 1 3.5 0 5.5-2.5 5-6-2.5 1-5 1-4-3z"/>
+      </svg>
+    </div>
+    <div class="faq-header-title">
+      <strong>Jan — Tuinman</strong>
+      <span><span class="faq-online-dot" aria-hidden="true"></span>Online — Stel ons een vraag</span>
+    </div>
+    <button class="faq-close" aria-label="Sluiten">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+  <div class="faq-messages" id="faq-messages" role="log" aria-live="polite" aria-atomic="false"></div>
+  <div id="faq-shortcuts" role="toolbar" aria-label="Snelkoppelingen"></div>
+  <div class="faq-input-row">
+    <input id="faq-input" type="text" placeholder="Typ uw vraag..." autocomplete="off" aria-label="Typ uw vraag">
+    <button id="faq-send" aria-label="Verstuur">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--bg)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<script>
+(function(){
+  var FAQ_DATA=[
+    {id:'stormschade',chip:'⛈️ Stormschade',
+     keywords:['storm','wind','schade','boom','tak','gevallen','omgewaaid','nood','spoed','dringend',
+               'urgent','gevaarlijk','crisis','help','emergency','damage','fallen','tree','omgevallen',
+               'instort','kapot','verwoest','gebroken tak','dreigt te vallen'],
+     answer:'Bij <strong>acute stormschade</strong> met direct gevaar (boom op huis, elektriciteitsdraden): bel eerst <strong>112</strong>. Daarna komen wij zo snel mogelijk langs voor de opruiming en herstelwerken.'},
+    {id:'diensten',chip:'🌿 Diensten & prijzen',
+     keywords:['dienst','service','prijs','kost','tarief','gazon','heg','haag','boom','snoeien',
+               'maaien','tuin','aanleg','onderhoud','offerte','kosten','hoeveel','euro','betalen',
+               'aanbod','welke','bieden','opkuis','bladruimen','onkruid','grasinzaai',
+               'price','cost','how much','services','what do you','garden','lawn','hedge'],
+     answer:'Wij bieden:<br>• Gazononderhoud &amp; maaien<br>• Heg- &amp; struiksnoei<br>• Boomverzorging &amp; snoeien<br>• Tuinaanleg op maat<br>• Tuinopkuis &amp; bladruimen<br>• Onkruidbestrijding<br><br>Vraag een <strong>gratis offerte</strong> aan — wij komen vrijblijvend langs.'},
+    {id:'bereikbaarheid',chip:'📍 Bereikbaarheid & regio',
+     keywords:['wanneer','bereikbaar','regio','gebied','stad','beschikbaar','open','uur','tijdstip',
+               'omgeving','openingsuur','openingsuren','openingstijden','uren','tijden',
+               'vandaag','morgen','weekend','zondag','zaterdag','avond','middag',
+               'hoe laat','werktijden','feestdag','vakantie','servicegebied','werkgebied',
+               'today','tomorrow','hours','when','time','schedule','available','open tomorrow'],
+     answer:'Wij zijn bereikbaar van <strong>ma–vr 07:30–18:00</strong> en <strong>za 08:00–13:00</strong>. Voor een vrijblijvend plaatsbezoek kunt u ons bellen of een offerte aanvragen.'},
+    {id:'afspraak',chip:'📅 Afspraak & offerte',
+     keywords:['afspraak','boek','reserveer','plan','komen','langskomen','inplannen','datum','bezoek',
+               'afspreken','langs','iemand sturen','tuinman sturen','kom langs','contact',
+               'offerte','plaatsbezoek','vrijblijvend','gratis bezoek',
+               'appointment','book','visit','schedule','send someone','quote'],
+     answer:'Een afspraak maken gaat het snelst telefonisch. Wij komen graag <strong>gratis en vrijblijvend</strong> bij u langs voor een offerte op maat — doorgaans al <strong>binnen de week</strong>.'},
+    {id:'over',chip:'🏡 Over Jan',
+     keywords:['wie','jan','verdant','groenservice','ervaring','jaar','team','betrouwbaar',
+               'gecertificeerd','over','garantie','klanten','info','vertrouw','verzekerd',
+               'reviews','beoordelingen','erkend','gediplomeerd','vakman','vakmensen',
+               'about','who are you','history','credentials','reliable'],
+     answer:'Jan is een vakkundige tuinman met meer dan <strong>15 jaar ervaring</strong> in Brugge en omgeving. Van gazononderhoud tot ontmossen en boomverzorging — alles met een <strong>vaste prijs</strong> en propere afwerking.'}
+  ];
+
+  var INTENT_PATTERNS=[
+    {re:/openings ?uur|openings ?uren|openingstijd|werktijden|hoe laat.*(open|beschikbaar|kom|langs)|wanneer.*(open|beschikbaar|bereikbaar|jullie)|are you open|what.*hour|when.*open|jullie.*open|open.*vandaag|vandaag.*open|morgen.*open|open.*morgen|open.*weekend|zijn jullie.*open/i, id:'bereikbaarheid'},
+    {re:/storm|wind.*schade|schade.*storm|boom.*gevallen|tak.*gevallen|omgewaaid|gevaarlijk.*boom|boom.*gevaarlijk|emergency|urgent.*tuin|snel.*help|help.*snel/i, id:'stormschade'},
+    {re:/hoeveel kost|wat kost|wat is de prijs|prijs.*van|tarief.*voor|offerte.*aanvragen|how much.*cost|price.*for|cost.*of|wat.*prijs|kost.*het/i, id:'diensten'},
+    {re:/afspraak.*maken|een afspraak|afspreken|wanneer.*langskomen|iemand.*sturen|tuinman.*sturen|kan.*langskomen|kom.*langs|plaatsbezoek.*aanvragen|vrijblijvend.*langs|appointment|book.*visit|schedule.*visit|langs.*komen/i, id:'afspraak'},
+    {re:/wie zijn jullie|over.*jan|over.*verdant|over.*groenservice|jullie.*ervaring|hoeveel jaar|gecertificeerd.*zijn|about you|who are you|betrouwbaar.*zijn/i, id:'over'}
+  ];
+
+  var PRICE_DATA={
+    gazon:{label:'Gazononderhoud',range:'€ 35 – € 85',note:'maaien + kanten steken, per beurt'},
+    heg:{label:'Heg- & struiksnoei',range:'€ 50 – € 150',note:'afhankelijk van lengte en hoogte'},
+    boom:{label:'Boomverzorging',range:'€ 80 – € 280',note:'incl. afvoer snoeihout'},
+    aanleg:{label:'Tuinaanleg',range:'op offerte',note:'gratis plaatsbezoek, prijs op maat'}
+  };
+  var PRICE_SYNONYMS={
+    gazon:['gazon','gras','maaien','lawn','grasmat','grasveld','pelouse','gazonmaaien'],
+    heg:['heg','haag','struik','heester','buxus','taxus','laurier','snoei','snoeien','heggen'],
+    boom:['boom','bomen','tak','takken','boomverzorging','knotten','vellen','rooien','boomsnoeien'],
+    aanleg:['aanleg','tuinaanleg','ontwerp','tuinontwerp','aanleggen','nieuwe tuin','heraanleg','inrichten']
+  };
+  var PRICE_CHIPS=[
+    {id:'gazon',label:'🌱 Gazon maaien'},
+    {id:'heg',label:'✂️ Heg & struiken'},
+    {id:'boom',label:'🌳 Boomverzorging'},
+    {id:'aanleg',label:'🏡 Tuinaanleg'},
+    {id:'other',label:'❓ Anders'}
+  ];
+  var PHONE='[TELEFOONNUMMER]';
+  var PHONE_DISPLAY='[TELEFOONNUMMER]';
+
+  var RE_GREET=/^(hallo|dag|goedemorgen|goedemiddag|goedenavond|goede avond|goede morgen|goede middag|hi|hello|hey|hoi|salut|goeie|bonjour)\b[\s!.?]*$/i;
+  var RE_THANKS=/(dankje|dank je wel|dank je|bedankt|dank u wel|dank u|merci|thanks|thank you|super bedankt|heel erg bedankt|fijn zo|top bedankt)/i;
+  var RE_YES=/^(ja|yes|ok|okay|graag|zeker|alstublieft|klopt|juist|correct|akkoord|goed|prima|doen|yep)\b[\s!.?]*$/i;
+  var RE_NO=/^(nee|neen|no|niet|negatief|liever niet|hoeft niet|nopes)\b[\s!.?]*$/i;
+
+  var btn=document.getElementById('faq-btn');
+  var panel=document.getElementById('faq-panel');
+  var msgs=document.getElementById('faq-messages');
+  var inp=document.getElementById('faq-input');
+  var sendBtn=document.getElementById('faq-send');
+  var closeBtn=panel.querySelector('.faq-close');
+  var dot=btn.querySelector('.faq-dot');
+  var opened=false;
+  var shortcutsBuilt=false;
+  var lastContext=null;
+  var conversationHistory=[];
+  var aiPending=false;
+
+  function togglePanel(){
+    opened=!opened;
+    panel.classList.toggle('open',opened);
+    btn.setAttribute('aria-expanded',String(opened));
+    if(opened){
+      if(dot) dot.style.display='none';
+      if(window.innerWidth<=640){
+        document.body.style.overflow='hidden';
+        btn.style.display='none';
+      }
+      if(!msgs.hasChildNodes()) showWelcome();
+      setTimeout(function(){inp.focus();},260);
+    } else {
+      document.body.style.overflow='';
+      btn.style.display='';
+    }
+  }
+
+  function buildShortcuts(){
+    if(shortcutsBuilt) return;
+    shortcutsBuilt=true;
+    var bar=document.getElementById('faq-shortcuts');
+    FAQ_DATA.forEach(function(faq){
+      var chip=document.createElement('button');
+      chip.type='button';chip.className='faq-chip';chip.textContent=faq.chip;
+      chip.addEventListener('click',function(){ sendMsg(faq.chip,faq); });
+      bar.appendChild(chip);
+    });
+  }
+
+  function showWelcome(){
+    addBotMsg('Hallo! Ik ben Jan, uw tuinman. Waarmee kan ik u helpen?',false);
+    buildShortcuts();
+  }
+
+  function levenshtein(a,b){
+    var m=a.length,n=b.length,dp=[];
+    for(var i=0;i<=m;i++){
+      dp[i]=[i];
+      for(var j=1;j<=n;j++)
+        dp[i][j]=i===0?j:j===0?i:a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
+    }
+    return dp[m][n];
+  }
+
+  function matchFAQ(text){
+    var norm=text.toLowerCase().replace(/[^a-z0-9àáâãäåæçèéêëìíîïðñòóôõöùúûüýþÿ\s]/g,'').replace(/\s+/g,' ').trim();
+
+    for(var p=0;p<INTENT_PATTERNS.length;p++){
+      if(INTENT_PATTERNS[p].re.test(norm)){
+        var intentMatch=FAQ_DATA.filter(function(f){ return f.id===INTENT_PATTERNS[p].id; })[0];
+        if(intentMatch) return intentMatch;
+      }
+    }
+
+    var noSpace=norm.replace(/\s/g,'');
+    var best=null,bestScore=0;
+    FAQ_DATA.forEach(function(faq){
+      var score=0;
+      faq.keywords.forEach(function(kw){
+        if(norm.indexOf(kw)!==-1||noSpace.indexOf(kw)!==-1) score+=2;
+      });
+      if(score>bestScore){bestScore=score;best=faq;}
+    });
+    if(bestScore>=2) return best;
+
+    var words=norm.split(' ').filter(function(w){ return w.length>=3; });
+    if(!words.length) return null;
+    best=null;bestScore=0;
+    FAQ_DATA.forEach(function(faq){
+      var score=0;
+      faq.keywords.forEach(function(kw){
+        words.forEach(function(word){
+          var maxDist=word.length>=7?2:word.length>=4?1:0;
+          if(maxDist>0&&levenshtein(word,kw)<=maxDist) score++;
+        });
+      });
+      if(score>bestScore){bestScore=score;best=faq;}
+    });
+    return bestScore>=1?best:null;
+  }
+
+  function buildCTA(){
+    var a=document.createElement('a');
+    a.href='tel:'+PHONE;a.className='faq-cta-btn';
+    a.textContent='📞 Bel direct: '+PHONE_DISPLAY;
+    return a;
+  }
+
+  function avatarEl(){
+    var av=document.createElement('div');av.className='faq-avatar';
+    av.innerHTML='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66L7 19c.93-1.32 2.29-3 4-3 2 0 3 1 5 1 3.5 0 5.5-2.5 5-6-2.5 1-5 1-4-3z"/></svg>';
+    return av;
+  }
+
+  function buildPriceChips(){
+    var wrap=document.createElement('div');wrap.className='faq-inline-chips';
+    PRICE_CHIPS.forEach(function(pc){
+      var b=document.createElement('button');
+      b.type='button';b.className='faq-inline-chip';b.textContent=pc.label;
+      b.addEventListener('click',function(){ handlePriceChip(pc.id,pc.label); });
+      wrap.appendChild(b);
+    });
+    return wrap;
+  }
+
+  function buildClarifyChips(){
+    var wrap=document.createElement('div');wrap.className='faq-inline-chips';
+    FAQ_DATA.forEach(function(faq){
+      var b=document.createElement('button');
+      b.type='button';b.className='faq-inline-chip';b.textContent=faq.chip;
+      b.addEventListener('click',function(){ sendMsg(faq.chip,faq); });
+      wrap.appendChild(b);
+    });
+    return wrap;
+  }
+
+  function handlePriceChip(id,label){
+    addUserMsg(label);
+    if(id==='other'){
+      lastContext='prices';
+      addBotMsg('Geen probleem! Beschrijf kort uw klus en ik geef u een ruwe indicatie, of bel ons voor een <strong>gratis offerte</strong>.',true);
+      return;
+    }
+    var d=PRICE_DATA[id];
+    if(d){
+      lastContext='prices';
+      addBotMsg('<strong>'+d.label+'</strong>: indicatief <strong>'+d.range+'</strong> incl. BTW<br><small style="color:var(--text-dim);">('+d.note+')</small><br><br>Voor een exacte prijs op maat, bel ons voor een gratis offerte.',true);
+    }
+  }
+
+  function addUserMsg(text){
+    var row=document.createElement('div');row.className='faq-bubble-row user';
+    var b=document.createElement('div');b.className='faq-bubble';b.textContent=text;
+    row.appendChild(b);msgs.appendChild(row);msgs.scrollTop=msgs.scrollHeight;
+  }
+
+  function addBotMsg(html,withCTA,extraNode){
+    if(withCTA===undefined) withCTA=true;
+    var typingRow=document.createElement('div');typingRow.className='faq-bubble-row bot';
+    var typing=document.createElement('div');typing.className='faq-typing';
+    typing.innerHTML='<span></span><span></span><span></span>';
+    typingRow.appendChild(avatarEl());typingRow.appendChild(typing);
+    msgs.appendChild(typingRow);msgs.scrollTop=msgs.scrollHeight;
+    setTimeout(function(){
+      typingRow.remove();
+      var row=document.createElement('div');row.className='faq-bubble-row bot';
+      var b=document.createElement('div');b.className='faq-bubble';
+      b.innerHTML=html;
+      if(extraNode) b.appendChild(extraNode);
+      if(withCTA) b.appendChild(buildCTA());
+      row.appendChild(avatarEl());row.appendChild(b);
+      msgs.appendChild(row);msgs.scrollTop=msgs.scrollHeight;
+    },650);
+  }
+
+  function matchPriceData(text){
+    var norm=text.toLowerCase();
+    var found=null;
+    Object.keys(PRICE_SYNONYMS).forEach(function(key){
+      PRICE_SYNONYMS[key].forEach(function(syn){ if(norm.indexOf(syn)!==-1) found=key; });
+    });
+    if(!found) Object.keys(PRICE_DATA).forEach(function(key){ if(norm.indexOf(key)!==-1) found=key; });
+    return found?PRICE_DATA[found]:null;
+  }
+
+  function showTyping(){
+    var row=document.createElement('div');row.className='faq-bubble-row bot';row.id='faq-ai-typing';
+    var t=document.createElement('div');t.className='faq-typing';t.innerHTML='<span></span><span></span><span></span>';
+    row.appendChild(avatarEl());row.appendChild(t);
+    msgs.appendChild(row);msgs.scrollTop=msgs.scrollHeight;
+  }
+
+  function hideTypingAndShow(html,withCTA){
+    var old=document.getElementById('faq-ai-typing');if(old) old.remove();
+    var row=document.createElement('div');row.className='faq-bubble-row bot';
+    var b=document.createElement('div');b.className='faq-bubble';b.innerHTML=html;
+    if(withCTA) b.appendChild(buildCTA());
+    row.appendChild(avatarEl());row.appendChild(b);
+    msgs.appendChild(row);msgs.scrollTop=msgs.scrollHeight;
+  }
+
+  async function callAI(userText){
+    if(aiPending) return;
+    aiPending=true;
+    inp.disabled=true;sendBtn.disabled=true;
+    conversationHistory.push({role:'user',content:userText});
+    showTyping();
+    try{
+      var res=await fetch('/api/chat',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({messages:conversationHistory.slice(-8)})
+      });
+      var data=await res.json();
+      if(data.reply){
+        conversationHistory.push({role:'assistant',content:data.reply});
+        hideTypingAndShow(data.reply,true);
+      } else {
+        throw new Error('no reply');
+      }
+    } catch(e){
+      var faq=matchFAQ(userText)||null;
+      var priceMatch=matchPriceData(userText);
+      if(priceMatch){
+        hideTypingAndShow('Voor <strong>'+priceMatch.label+'</strong> rekenen wij indicatief <strong>'+priceMatch.range+'</strong> incl. BTW<br><small style="color:var(--text-dim);">('+priceMatch.note+')</small>',true);
+      } else if(faq){
+        hideTypingAndShow(faq.answer,true);
+      } else {
+        hideTypingAndShow('Excuses, er is even een storing. Probeer het opnieuw of bel ons direct.',true);
+      }
+    } finally {
+      aiPending=false;inp.disabled=false;sendBtn.disabled=false;inp.focus();
+    }
+  }
+
+  function sendMsg(text,matchedFaq){
+    var trimmed=text.trim();if(!trimmed||aiPending) return;
+    addUserMsg(trimmed);inp.value='';
+
+    if(RE_GREET.test(trimmed)){
+      addBotMsg('Hallo! Waarmee kan ik u helpen? Stel gerust uw vraag.',false);
+      return;
+    }
+    if(RE_THANKS.test(trimmed)){
+      addBotMsg('Graag gedaan! Nog andere vragen?',false);
+      lastContext=null;return;
+    }
+    if(RE_NO.test(trimmed)&&lastContext){
+      addBotMsg('Geen probleem. Heeft u een andere vraag?',false);
+      lastContext=null;return;
+    }
+
+    if(matchedFaq){
+      lastContext=matchedFaq.id;
+      if(matchedFaq.id==='diensten'){
+        addBotMsg('Wij bieden:<br>• Gazononderhoud &amp; maaien<br>• Heg- &amp; struiksnoei<br>• Boomverzorging &amp; snoeien<br>• Tuinaanleg op maat<br>• Tuinopkuis &amp; bladruimen<br><br>Over welke dienst wilt u een prijsindicatie?',false,buildPriceChips());
+        return;
+      }
+      if(matchedFaq.id==='bereikbaarheid'){
+        addBotMsg(matchedFaq.answer+'<br><br>Heeft u <strong>stormschade</strong> of wilt u een <strong>afspraak plannen</strong>?',false);
+        return;
+      }
+      if(matchedFaq.id==='afspraak'){
+        addBotMsg('Een afspraak maken gaat het snelst telefonisch. Voor welke tuinklus heeft u iemand nodig?',false);
+        return;
+      }
+      addBotMsg(matchedFaq.answer,true);
+      return;
+    }
+
+    callAI(trimmed);
+  }
+
+  btn.addEventListener('click',togglePanel);
+  closeBtn.addEventListener('click',togglePanel);
+  sendBtn.addEventListener('click',function(){sendMsg(inp.value);});
+  inp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();sendMsg(inp.value);}});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&opened) togglePanel();});
+})();
+</script>
+
+</body>
+</html>
