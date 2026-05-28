@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#000000">
 
-<title>Verdant. Tuinaanleg & onderhoud in Brugge.</title>
+<title>AD Groenservice. Tuinaanleg & onderhoud in Brugge.</title>
 <meta name="description" content="Professionele tuinaanleg en onderhoud in Brugge en West-Vlaanderen. Duurzaam, vakkundig, ecologisch. Bel direct.">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -208,7 +208,7 @@
   @media (max-width: 768px) { .float-contact { display: none; } }
 
   /* NAV */
-  .nav { position: fixed; top: 0; left: 0; right: 0; padding: 22px 36px; display: flex; justify-content: space-between; align-items: center; z-index: 50; background: transparent; transition: all 0.4s; color: #fff; }
+  .nav { position: fixed; top: 0; left: 0; right: 0; padding: 30px 36px; display: flex; justify-content: space-between; align-items: center; z-index: 50; background: transparent; transition: all 0.4s; color: #fff; }
   .nav.scrolled { background: rgba(5,5,5,0.82); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 14px 36px; border-bottom: 1px solid rgba(255,255,255,0.1); }
   .nav.on-light { background: rgba(245,245,241,0.94); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-light); color: var(--text); }
   .nav.on-light .logo-text { color: var(--text); }
@@ -233,7 +233,7 @@
   /* ============================================
      HERO
   ============================================ */
-  .hero { min-height: calc(100vh - 32px); margin: 16px; border-radius: 24px; padding: 0; position: relative; overflow: hidden; background: var(--bg); display: flex; align-items: stretch; }
+  .hero { min-height: calc(100vh - 48px); margin: 24px; border-radius: 24px; padding: 0; position: relative; overflow: hidden; background: var(--bg); display: flex; align-items: stretch; }
   .hero-video { position: absolute; inset: 0; z-index: 0; }
   .hero-video video, .hero-video img { width: 100%; height: 100%; object-fit: cover; }
   .hero-overlay {
@@ -322,7 +322,7 @@
   .hero-left { display: flex; flex-direction: column; justify-content: flex-end; }
   .hero-meta { display: flex; align-items: center; margin-bottom: 28px; font-family: 'Space Grotesk', sans-serif; font-size: 11px; color: var(--lime); letter-spacing: 2px; text-transform: uppercase; opacity: 0; font-weight: 700; }
 
-  h1 { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: clamp(40px, 6.8vw, 92px); line-height: 1.0; letter-spacing: -1.5px; margin-bottom: 36px; max-width: 900px; text-shadow: 0 4px 30px rgba(0,0,0,0.6); }
+  h1 { font-family: 'Inter Tight', sans-serif; font-weight: 800; font-size: clamp(40px, 6.8vw, 92px); line-height: 1.0; letter-spacing: -2px; margin-bottom: 36px; max-width: 900px; text-shadow: 0 4px 30px rgba(0,0,0,0.6); }
   h1 .word-line { display: block; overflow: hidden; padding: 2px 0; }
   h1 .word { display: inline-block; transform: translateY(110%); }
   h1 .lime { color: var(--lime); }
@@ -469,10 +469,11 @@
   /* Hero cards panel (right side) */
   .hero-panel { display: flex; flex-direction: column; gap: 12px; opacity: 0; position: relative; z-index: 4; }
   .hero-panel-cards { display: flex; flex-direction: row; gap: 10px; }
-  .hero-panel-cards .hero-panel-card { flex: 1; min-width: 0; transition: opacity 0.45s ease, border-color 0.45s ease, transform 0.45s ease; }
-  .hero-panel-card { background: rgba(255,255,255,0.07); backdrop-filter: blur(32px) saturate(180%); -webkit-backdrop-filter: blur(32px) saturate(180%); border: 1px solid rgba(255,255,255,0.18); border-radius: 16px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.15); }
+  .hero-panel-cards .hero-panel-card { flex: 1; min-width: 0; transition: opacity 0.45s ease, border-color 0.45s ease, transform 0.45s ease, box-shadow 0.3s ease; }
+  .hero-panel-card { background: rgba(255,255,255,0.07); backdrop-filter: blur(32px) saturate(180%); -webkit-backdrop-filter: blur(32px) saturate(180%); border: 1px solid rgba(255,255,255,0.18); border-radius: 16px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.15); text-decoration: none; color: inherit; }
   .hero-panel-card.active-card { border-color: rgba(255,255,255,0.32); box-shadow: 0 4px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2); }
   .hero-panel-card.dim-card { opacity: 0.55; transform: scale(0.97); }
+  .hero-panel-card:hover { opacity: 1 !important; transform: scale(1.02) !important; border-color: rgba(102,187,53,0.5) !important; box-shadow: 0 8px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.2) !important; cursor: pointer; }
   .hero-panel-card img { width: 76px; height: 76px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
   .hero-panel-card-title { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700; color: #ffffff; margin-bottom: 5px; line-height: 1.2; }
   .hero-panel-card-desc { font-family: 'Inter Tight', sans-serif; font-size: 11px; color: rgba(255,255,255,0.55); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
@@ -1951,7 +1952,7 @@
     <div id="intro-mark">
       <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75C7 8 17 8 17 8z"/></svg>
     </div>
-    <div id="intro-name">Verdant.</div>
+    <div id="intro-name">AD Groenservice.</div>
     <div id="intro-tagline">Tuinaanleg &amp; onderhoud · Brugge</div>
   </div>
   <div id="intro-line"></div>
@@ -1978,7 +1979,7 @@
     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57-.35-.11-.74-.03-1.02.24l-2.2 2.2c-2.83-1.44-5.15-3.75-6.59-6.59l2.2-2.21c.28-.26.36-.65.25-1C8.7 6.45 8.5 5.25 8.5 4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1z"/></svg>
     Bellen
   </a>
-  <a href="https://wa.me/32000000000?text=Hallo%20Verdant%2C%20ik%20heb%20een%20vraag." class="mc-wa" target="_blank" rel="noopener noreferrer" aria-label="Stuur WhatsApp">
+  <a href="https://wa.me/32000000000?text=Hallo%20AD%20Groenservice%2C%20ik%20heb%20een%20vraag." class="mc-wa" target="_blank" rel="noopener noreferrer" aria-label="Stuur WhatsApp">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.297-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
     WhatsApp
   </a>
@@ -2005,7 +2006,7 @@
   <a href="tel:+320000000000" class="fc-btn fc-tel" data-label="Bel ons" data-cursor="hover" aria-label="Bel ons op [TODO: TELEFOONNUMMER]">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57-.35-.11-.74-.03-1.02.24l-2.2 2.2c-2.83-1.44-5.15-3.75-6.59-6.59l2.2-2.21c.28-.26.36-.65.25-1C8.7 6.45 8.5 5.25 8.5 4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1z"/></svg>
   </a>
-  <a href="https://wa.me/32000000000?text=Hallo%20Verdant%2C%20ik%20heb%20een%20vraag." class="fc-btn fc-wa" data-label="WhatsApp" data-cursor="hover" target="_blank" rel="noopener noreferrer" aria-label="Stuur WhatsApp bericht">
+  <a href="https://wa.me/32000000000?text=Hallo%20AD%20Groenservice%2C%20ik%20heb%20een%20vraag." class="fc-btn fc-wa" data-label="WhatsApp" data-cursor="hover" target="_blank" rel="noopener noreferrer" aria-label="Stuur WhatsApp bericht">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
   </a>
 </div>
@@ -2039,9 +2040,8 @@
       </div>
 
       <h1>
-        <span class="word-line"><span class="word">Uw tuin</span></span>
-        <span class="word-line"><span class="word">in topvorm</span></span>
-        <span class="word-line"><span class="word">gebracht.</span></span>
+        <span class="word-line"><span class="word">Vakkennis,</span></span>
+        <span class="word-line"><span class="word">geen praatjes.</span></span>
       </h1>
 
       <p class="hero-sub">
@@ -2058,33 +2058,24 @@
         </a>
       </div>
 
-      <div class="hero-service-pills">
-        <div class="hero-pills">
-          <span class="hero-pill">Tuinaanleg</span>
-          <span class="hero-pill">Snoeiwerk</span>
-          <span class="hero-pill">Onderhoud</span>
-          <span class="hero-pill">Beregening</span>
-          <span class="hero-pill">Ecologisch</span>
-        </div>
-      </div>
     </div>
 
     <div class="hero-panel" id="heroPanel">
       <div class="hero-panel-cards">
-        <div class="hero-panel-card">
+        <a href="#diensten" class="hero-panel-card" aria-label="Bekijk onze tuinaanleg service">
           <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=144&h=144&q=80" alt="Tuinaanleg Brugge" loading="lazy">
           <div>
-            <div class="hero-panel-card-title">Uw tuin in topvorm</div>
-            <div class="hero-panel-card-desc">Vakkundige tuinaanleg en onderhoud op maat, netjes afgewerkt.</div>
+            <div class="hero-panel-card-title">Tuinaanleg</div>
+            <div class="hero-panel-card-desc">Vakkundige aanleg op maat, netjes afgewerkt en op vaste prijs.</div>
           </div>
-        </div>
-        <div class="hero-panel-card">
+        </a>
+        <a href="#diensten" class="hero-panel-card" aria-label="Bekijk onderhoud service">
           <img src="https://images.unsplash.com/photo-1591857177580-dc82b9ac4e1e?auto=format&fit=crop&w=144&h=144&q=80" alt="Snoeiwerk en onderhoud" loading="lazy">
           <div>
-            <div class="hero-panel-card-title">Snoei en onderhoud</div>
-            <div class="hero-panel-card-desc">Altijd Jan zelf — geen onderaannemers, vaste prijs vóór de start.</div>
+            <div class="hero-panel-card-title">Onderhoud</div>
+            <div class="hero-panel-card-desc">Altijd dezelfde vakman — geen onderaannemers, vaste prijs.</div>
           </div>
-        </div>
+        </a>
       </div>
       <div class="hero-panel-dots">
         <span class="hero-panel-dot active"></span>
@@ -2117,7 +2108,7 @@
   <div class="container">
     <div class="intro-grid">
       <div class="intro-image" style="position: relative;">
-        <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=900&q=80" alt="Verdant tuinier aan het werk">
+        <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=900&q=80" alt="AD Groenservice tuinier aan het werk">
         <div class="mask"></div>
         <div class="badge">Beschikbaar</div>
         <div class="evergreen-badge" style="top: 50%; left: 50%; transform: translate(-50%, -50%);">
@@ -2136,7 +2127,7 @@
         </div>
       </div>
       <div class="intro-content">
-        <span class="section-tag section-tag-light">Over Verdant</span>
+        <span class="section-tag section-tag-light">Over AD Groenservice</span>
         <h2 class="section-title">
           <span class="line"><span>Vakkennis,</span></span>
           <span class="line"><span>geen <span class="lime">praatjes.</span></span></span>
@@ -2464,7 +2455,7 @@
         <span class="google-summary-score">4.9</span>
         <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
       </div>
-      <a href="https://www.google.com/maps/place/Verdant" target="_blank" rel="noopener noreferrer" class="google-summary-count" aria-label="Bekijk alle reviews op Google">Gebaseerd op [TODO: AANTAL_REVIEWS] Google reviews ↗</a>
+      <a href="https://www.google.com/maps/place/AD+Groenservice" target="_blank" rel="noopener noreferrer" class="google-summary-count" aria-label="Bekijk alle reviews op Google">Gebaseerd op [TODO: AANTAL_REVIEWS] Google reviews ↗</a>
     </div>
   </div>
 
@@ -2762,7 +2753,7 @@
               <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57-.35-.11-.74-.03-1.02.24l-2.2 2.2c-2.83-1.44-5.15-3.75-6.59-6.59l2.2-2.21c.28-.26.36-.65.25-1C8.7 6.45 8.5 5.25 8.5 4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1z"/></svg>
               Bel ons
             </a>
-            <a href="https://wa.me/32000000000?text=Hallo%20Verdant%2C%20ik%20heb%20een%20vraag." class="faq-cta-link faq-cta-wa" target="_blank" rel="noopener noreferrer" aria-label="Stuur WhatsApp">
+            <a href="https://wa.me/32000000000?text=Hallo%20AD%20Groenservice%2C%20ik%20heb%20een%20vraag." class="faq-cta-link faq-cta-wa" target="_blank" rel="noopener noreferrer" aria-label="Stuur WhatsApp">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.297-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
               WhatsApp
             </a>
@@ -2833,7 +2824,7 @@
       <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57-.35-.11-.74-.03-1.02.24l-2.2 2.2c-2.83-1.44-5.15-3.75-6.59-6.59l2.2-2.21c.28-.26.36-.65.25-1C8.7 6.45 8.5 5.25 8.5 4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1z"/></svg>
       <span>[TODO: TELEFOONNUMMER]</span>
     </a>
-    <a href="https://wa.me/32000000000?text=Hallo%20Verdant%2C%20ik%20heb%20een%20vraag." class="btn btn-whatsapp magnetic btn-cta-final" data-cursor="hover" target="_blank" rel="noopener noreferrer" aria-label="Stuur een WhatsApp bericht">
+    <a href="https://wa.me/32000000000?text=Hallo%20AD%20Groenservice%2C%20ik%20heb%20een%20vraag." class="btn btn-whatsapp magnetic btn-cta-final" data-cursor="hover" target="_blank" rel="noopener noreferrer" aria-label="Stuur een WhatsApp bericht">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.297-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
       <span>WhatsApp</span>
     </a>
@@ -2845,11 +2836,11 @@
 <footer>
   <div class="footer-content">
     <div class="footer-brand">
-      <a href="#" class="logo" aria-label="Verdant homepage">
+      <a href="#" class="logo" aria-label="AD Groenservice homepage">
         <div class="logo-mark">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75C7 8 17 8 17 8z"/></svg>
         </div>
-        <div class="logo-text">Verdant<span>EST. 2010</span></div>
+        <div class="logo-text">AD <span class="logo-lime">Groenservice</span></div>
       </a>
       <p>Erkend tuinier in Brugge en omstreken. BIO-gecertificeerd, betrouwbaar, betaalbaar.</p>
     </div>
@@ -2875,7 +2866,7 @@
       <p>BA verzekerd</p>
     </div>
   </div>
-  <div class="copyright">© 2026 Verdant Tuinaanleg · Alle rechten voorbehouden</div>
+  <div class="copyright">© 2026 AD Groenservice · Alle rechten voorbehouden</div>
 </footer>
 
 <script>
@@ -3347,7 +3338,7 @@
         <div class="marker-hq-ring"></div>
         <div class="marker-hq-pin"></div>
         <svg class="marker-hq-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h7l-1 8 11-14h-7l1-6z"/></svg>
-        <div class="marker-hq-label">HQ · Verdant</div>
+        <div class="marker-hq-label">HQ · AD Groenservice</div>
       </div>
     `,
     iconSize: [40, 50],
