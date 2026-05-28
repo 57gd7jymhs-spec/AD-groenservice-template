@@ -2,6 +2,7 @@
 .claude/
 node_modules/
 *.log
-
-# test
 .vercel
+.vscode/
+video/
+old templates/

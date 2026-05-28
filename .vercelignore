@@ -1,18 +1,3 @@
-# Junk / debris
-images/before drain_files/
-images/before drain.html
-
-# Duplicate originals — only root-level images are used in the site
-images/Faucet new v2/
-images/Drain pictures v2/
-images/TOILET install v2/
-
-# Reference material not needed at runtime
-Brand assets/
-components/
-CONTENT.md
-
-# Dev / tooling
-.claude/
-.screenshots/
-node_modules/
+video/
+videos/
+*.mp4
